@@ -1,0 +1,101 @@
+#import "TGBridgeRemoteHandler.h"
+#import "TGBridgeRemoteSubscription.h"
+
+#import "TGInterfaceManager.h"
+#import "TGModernConversationController.h"
+
+#import "TGCustomAlertView.h"
+
+@implementation TGBridgeRemoteHandler
+
++ (SSignal *)handlingSignalForSubscription:(TGBridgeSubscription *)subscription server:(TGBridgeServer *)__unused server
+{
+    if ([subscription isKindOfClass:[TGBridgeRemoteSubscription class]])
+    {
+        TGDispatchOnMainThread(^
+        {
+            TGBridgeRemoteSubscription *remoteSubscription = (TGBridgeRemoteSubscription *)subscription;
+            
+            if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive)
+            {
+                UILocalNotification *notification = [[UILocalNotification alloc] init];
+                notification.fireDate = [NSDate dateWithTimeIntervalSinceNow:0.5];
+                notification.alertBody = TGLocalized(@"WatchRemote.NotificationText");
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+                notification.category = @"wr";
+#endif
+                notification.soundName = UILocalNotificationDefaultSoundName;
+                notification.userInfo = @{ @"peerId": @(remoteSubscription.peerId),
+                                           @"mid": @(remoteSubscription.messageId),
+                                           @"type": @(remoteSubscription.type),
+                                           @"autoPlay": @(remoteSubscription.autoPlay) };
+                
+                [[UIApplication sharedApplication] scheduleLocalNotification:notification];
+            }
+            else
+            {
+                TGModernConversationController *controller = [[TGInterfaceManager instance] currentControllerWithPeerId:remoteSubscription.peerId];
+                if (controller != nil)
+                {
+                    [self navigateToPeerId:remoteSubscription.peerId messageId:remoteSubscription.messageId startMedia:remoteSubscription.autoPlay];
+                }
+                else
+                {
+                    [TGCustomAlertView presentAlertWithTitle:TGLocalized(@"WatchRemote.AlertTitle") message:TGLocalized(@"WatchRemote.AlertText") cancelButtonTitle:TGLocalized(@"Common.Cancel") okButtonTitle:TGLocalized(@"WatchRemote.AlertOpen") completionBlock:^(bool okButtonPressed)
+                    {
+                        if (okButtonPressed)
+                            [self navigateToPeerId:remoteSubscription.peerId messageId:remoteSubscription.messageId startMedia:remoteSubscription.autoPlay];
+                    }];
+                }
+            }
+        });
+        
+        return [SSignal complete];
+    }
+
+    return [SSignal fail:nil];
+}
+
++ (void)navigateToPeerId:(int64_t)peerId messageId:(int32_t)messageId startMedia:(bool)startMedia
+{
+    TGModernConversationController *controller = [[TGInterfaceManager instance] currentControllerWithPeerId:peerId];
+    if (controller != nil)
+    {
+        [controller scrollToMessage:messageId peerId:0 sourceMessageId:0 animated:true];
+        if (startMedia)
+            [controller openMediaFromMessage:messageId peerId:0 instant:false];
+    }
+    else
+    {
+        [[TGInterfaceManager instance] navigateToConversationWithId:peerId conversation:nil performActions:nil atMessage:@{ @"mid": @(messageId) } clearStack:true openKeyboard:false canOpenKeyboardWhileInTransition:false animated:true];
+        controller = [[TGInterfaceManager instance] currentControllerWithPeerId:peerId];
+        
+        if (startMedia)
+        {
+            TGDispatchAfter(0.8f, dispatch_get_main_queue(), ^
+            {
+                [controller openMediaFromMessage:messageId peerId:0 instant:false];
+            });
+        }
+    }
+}
+
++ (void)handleLocalNotification:(NSDictionary *)userInfo
+{
+    int64_t peerId = [(NSNumber *)[userInfo objectForKey:@"peerId"] longLongValue];
+    int32_t messageId = [(NSNumber *)[userInfo objectForKey:@"mid"] intValue];
+    //int32_t type = [(NSNumber *)[userInfo objectForKey:@"type"] intValue];
+    bool autoPlay = [(NSNumber *)[userInfo objectForKey:@"autoPlay"] boolValue];
+    
+    TGDispatchAfter(0.8f, dispatch_get_main_queue(), ^
+    {
+        [self navigateToPeerId:peerId messageId:messageId startMedia:autoPlay];
+    });
+}
+
++ (NSArray *)handledSubscriptions
+{
+    return @[ [TGBridgeRemoteSubscription class] ];
+}
+
+@end

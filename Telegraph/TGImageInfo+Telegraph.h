@@ -1,0 +1,38 @@
+/*
+ * This is the source code of Telegram for iOS v. 1.1
+ * It is licensed under GNU GPL v. 2 or later.
+ * You should have received a copy of the license in this archive (see LICENSE).
+ *
+ * Copyright Peter Iakovlev, 2013.
+ */
+
+#import "../submodules/LegacyComponents/LegacyComponents/LegacyComponents.h"
+
+#import "TL/TLMetaScheme.h"
+
+#import "SecretLayer23.h"
+#import "SecretLayer46.h"
+#import "SecretLayer66.h"
+#import "SecretLayer73.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+NSString *extractFileUrl(id fileLocation);
+    
+#ifdef __cplusplus
+}
+#endif
+
+@interface TGImageInfo (Telegraph)
+
+- (id)initWithTelegraphSizesDescription:(NSArray *)sizesDesc;
+- (id)initWithTelegraphSizesDescription:(NSArray *)sizesDesc cachedData:(__autoreleasing NSData **)cachedData;
+- (id)initWithModernTelegraphPhoto:(TLPhoto$photo *)photo cachedData:(__autoreleasing NSData **)cachedData;
+- (id)initWithSecret23SizesDescription:(NSArray *)sizesDesc cachedData:(__autoreleasing NSData **)cachedData;
+- (id)initWithSecret46SizesDescription:(NSArray *)sizesDesc cachedData:(__autoreleasing NSData **)cachedData;
+- (id)initWithSecret66SizesDescription:(NSArray *)sizesDesc cachedData:(__autoreleasing NSData **)cachedData;
+- (id)initWithSecret73SizesDescription:(NSArray *)sizesDesc cachedData:(__autoreleasing NSData **)cachedData;
+
+@end

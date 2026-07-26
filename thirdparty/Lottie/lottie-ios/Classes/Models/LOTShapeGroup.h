@@ -1,0 +1,22 @@
+#import "../LOTXcode46Compat.h"
+//
+//  LOTShape.h
+//  LottieAnimator
+//
+//  Created by Brandon Withrow on 12/14/15.
+//  Copyright © 2015 Brandon Withrow. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>
+
+@interface LOTShapeGroup : NSObject
+
+- (instancetype )initWithJSON:(NSDictionary *)jsonDictionary;
+
+@property (nonatomic, readonly) NSString *keyname;
+@property (nonatomic, readonly) NSArray *items;
+
++ (id )shapeItemWithJSON:(NSDictionary * )itemJSON;
+
+@end

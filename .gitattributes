@@ -1,0 +1,23 @@
+# Keep source and project metadata stable across macOS/Linux checkouts.
+* text=auto
+*.h text eol=lf
+*.m text eol=lf
+*.mm text eol=lf
+*.c text eol=lf
+*.cc text eol=lf
+*.cpp text eol=lf
+*.swift text eol=lf
+*.pbxproj text eol=lf
+*.xcconfig text eol=lf
+*.plist text eol=lf
+*.strings text eol=lf
+*.sh text eol=lf
+*.rb text eol=lf
+
+# Do not attempt textual conversion of Apple/build assets.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.a binary
+*.dylib binary

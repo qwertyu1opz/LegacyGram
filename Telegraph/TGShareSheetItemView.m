@@ -1,0 +1,62 @@
+#import "TGShareSheetItemView.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/LegacyComponents.h"
+
+@interface TGShareSheetItemView ()
+{
+}
+
+@end
+
+@implementation TGShareSheetItemView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self != nil)
+    {
+    }
+    return self;
+}
+
+- (CGFloat)preferredHeightForMaximumHeight:(CGFloat)__unused maximumHeight
+{
+    return 57.0f;
+}
+
+- (bool)followsKeyboard
+{
+    return false;
+}
+
+- (void)setPreferredHeightNeedsUpdate
+{
+    if (_preferredHeightNeedsUpdate) {
+        _preferredHeightNeedsUpdate(self);
+    }
+}
+
+- (bool)wantsFullSeparator
+{
+    return false;
+}
+
+- (void)sheetDidAppear
+{
+    
+}
+
+- (void)sheetWillDisappear
+{
+    
+}
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+}
+
+- (void)setHighlightedImage:(UIImage *)__unused highlightedImage {
+    
+}
+
+@end

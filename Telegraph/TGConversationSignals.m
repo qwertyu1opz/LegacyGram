@@ -1,0 +1,91 @@
+#import "TGConversationSignals.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/ActionStage.h"
+#import "TGDatabase.h"
+#import "TGTelegramNetworking.h"
+#import "TGTelegraph.h"
+
+@interface TGConversationUpdatesHelper : NSObject <ASWatcher>
+{
+    int64_t _conversationId;
+    void (^_conversationUpdated)(TGConversation *);
+}
+
+@property (nonatomic, strong) ASHandle *actionHandle;
+
+@end
+
+@implementation TGConversationUpdatesHelper
+
+- (NSString *)watchPath
+{
+    return [[NSString alloc] initWithFormat:@"/tg/conversation/(%lld)/conversation", _conversationId];
+}
+
+- (instancetype)initWithConversationId:(int64_t)conversationId full:(bool)full conversationUpdated:(void (^)(TGConversation *))conversationUpdated
+{
+    self = [super init];
+    if (self != nil)
+    {
+        _conversationId = conversationId;
+        _conversationUpdated = [conversationUpdated copy];
+        
+        _actionHandle = [[ASHandle alloc] initWithDelegate:self];
+        [ActionStageInstance() watchForPath:[self watchPath] watcher:self];
+        
+        if (full)
+        {
+            [ActionStageInstance() requestActor:[NSString stringWithFormat:@"/tg/conversationExtended/(%lld)", conversationId] options:@{@"conversationId": @(conversationId)} watcher:TGTelegraphInstance];
+        }
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [_actionHandle reset];
+    [ActionStageInstance() removeWatcher:self fromPath:[self watchPath]];
+}
+
+- (void)actionStageResourceDispatched:(NSString *)path resource:(id)resource arguments:(id)__unused arguments
+{
+    if ([path isEqualToString:[self watchPath]])
+    {
+        TGConversation *conversation = ((SGraphObjectNode *)resource).object;
+        if (_conversationUpdated)
+            _conversationUpdated(conversation);
+    }
+}
+
+@end
+
+@implementation TGConversationSignals
+
++ (SSignal *)conversationWithPeerId:(int64_t)peerId full:(bool)full
+{
+    SSignal *updatesSignal = [[SSignal alloc] initWithGenerator:^id<SDisposable>(SSubscriber *subscriber)
+    {
+        TGConversationUpdatesHelper *helper = [[TGConversationUpdatesHelper alloc] initWithConversationId:peerId full:full conversationUpdated:^(TGConversation *conversation)
+        {
+            [subscriber putNext:conversation];
+        }];
+        return [[SBlockDisposable alloc] initWithBlock:^
+        {
+            [helper description]; //keep reference
+        }];
+    }];
+    
+    return [[[SSignal alloc] initWithGenerator:^id<SDisposable>(SSubscriber *subscriber)
+    {
+        TGConversation *conversation = [TGDatabaseInstance() loadConversationWithId:peerId];
+        if (conversation == nil) {
+            [subscriber putError:nil];
+        } else {
+            [subscriber putNext:conversation];
+            [subscriber putCompletion];
+        }
+        return nil;
+    }] then:updatesSignal];
+}
+
+@end

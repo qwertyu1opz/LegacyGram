@@ -1,0 +1,27 @@
+#ifndef TG_LEGACY_TL_TLMESSAGES_ALLSTICKERS_H
+#define TG_LEGACY_TL_TLMESSAGES_ALLSTICKERS_H
+
+#import <Foundation/Foundation.h>
+
+#import "TLObject.h"
+#import "TLMetaRpc.h"
+
+
+@interface TLmessages_AllStickers : NSObject <TLObject>
+
+
+@end
+
+@interface TLmessages_AllStickers$messages_allStickersNotModified : TLmessages_AllStickers
+
+
+@end
+
+@interface TLmessages_AllStickers$messages_allStickers : TLmessages_AllStickers
+
+@property (nonatomic) int32_t n_hash;
+@property (nonatomic, retain) NSArray *sets;
+
+@end
+
+#endif

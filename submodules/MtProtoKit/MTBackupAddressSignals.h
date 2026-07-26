@@ -1,0 +1,10 @@
+#import <Foundation/Foundation.h>
+
+@class MTSignal;
+@class MTContext;
+
+@interface MTBackupAddressSignals : NSObject
+
++ (MTSignal * )fetchBackupIps:(bool)isTestingEnvironment currentContext:(MTContext * )currentContext additionalSource:(MTSignal * )additionalSource phoneNumber:(NSString * )phoneNumber;
+
+@end

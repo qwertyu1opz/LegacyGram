@@ -1,0 +1,38 @@
+#import "TGSeparatorCollectionItemView.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/LegacyComponents.h"
+
+#import "TGPresentation.h"
+
+@interface TGSeparatorCollectionItemView () {
+    UIView *_separatorView;
+}
+
+@end
+
+@implementation TGSeparatorCollectionItemView
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self != nil) {
+        _separatorView = [[UIView alloc] init];
+        _separatorView.backgroundColor = TGSeparatorColor();
+        [self.contentView addSubview:_separatorView];
+    }
+    return self;
+}
+
+- (void)setPresentation:(TGPresentation *)presentation
+{
+    [super setPresentation:presentation];
+    
+    _separatorView.backgroundColor = presentation.pallete.collectionMenuSeparatorColor;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    _separatorView.frame = CGRectMake(0.0f, 0.0f, self.bounds.size.width, TGScreenPixel);
+}
+
+@end

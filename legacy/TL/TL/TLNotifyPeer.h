@@ -1,0 +1,32 @@
+#ifndef TG_LEGACY_TL_TLNOTIFYPEER_H
+#define TG_LEGACY_TL_TLNOTIFYPEER_H
+
+#import <Foundation/Foundation.h>
+
+#import "TLObject.h"
+#import "TLMetaRpc.h"
+
+@class TLPeer;
+
+@interface TLNotifyPeer : NSObject <TLObject>
+
+
+@end
+
+@interface TLNotifyPeer$notifyPeer : TLNotifyPeer
+
+@property (nonatomic, retain) TLPeer *peer;
+
+@end
+
+@interface TLNotifyPeer$notifyUsers : TLNotifyPeer
+
+
+@end
+
+@interface TLNotifyPeer$notifyChats : TLNotifyPeer
+
+
+@end
+
+#endif

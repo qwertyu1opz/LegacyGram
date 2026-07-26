@@ -1,0 +1,24 @@
+#import "../submodules/LegacyComponents/LegacyComponents/TGModernConversationAssociatedInputPanel.h"
+
+@class TGMessage;
+@class TGPresentation;
+
+@interface TGModenConcersationReplyAssociatedPanel : TGModernConversationAssociatedInputPanel
+
+@property (nonatomic, strong) NSString *customTitle;
+@property (nonatomic, strong, readonly) TGMessage *message;
+@property (nonatomic) UIEdgeInsets lineInsets;
+@property (nonatomic) bool largeDismissButton;
+@property (nonatomic) bool compactMode;
+@property (nonatomic, copy) NSString *compactPrefix;
+
+@property (nonatomic, copy) void (^pressed)();
+@property (nonatomic, copy) void (^dismiss)();
+
+- (instancetype)initWithMessage:(TGMessage *)message;
+
+- (void)updateMessage:(TGMessage *)message;
+
+- (void)setTitleFont:(UIFont *)titleFont;
+
+@end

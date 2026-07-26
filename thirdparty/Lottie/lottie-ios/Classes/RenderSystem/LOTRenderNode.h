@@ -1,0 +1,18 @@
+#import "../LOTXcode46Compat.h"
+//
+//  LOTRenderNode.h
+//  Pods
+//
+//  Created by brandon_withrow on 6/27/17.
+//
+//
+
+#import "LOTAnimatorNode.h"
+
+@interface LOTRenderNode : LOTAnimatorNode
+
+@property (nonatomic, readonly, strong) CAShapeLayer *  outputLayer;
+
+- (NSDictionary * )actionsForRenderLayer;
+
+@end

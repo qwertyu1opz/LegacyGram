@@ -1,0 +1,4 @@
+// Copy this file to config.h and replace both placeholders with credentials
+// obtained for your own Telegram application. Never commit config.h.
+#define SETUP_API_ID(apiId) apiId = 12345;
+#define SETUP_API_HASH(apiHash) apiHash = @"replace-with-your-own-api-hash";

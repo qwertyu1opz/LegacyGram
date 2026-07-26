@@ -1,0 +1,33 @@
+//
+//  Prefix header
+//
+//  The contents of this file are implicitly included at the beginning of every source file.
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+#endif
+
+#ifndef NS_ENUM
+#define NS_ENUM(_type, _name) _type _name; enum
+#endif
+
+#ifndef NS_OPTIONS
+#define NS_OPTIONS(_type, _name) _type _name; enum
+#endif
+
+#ifndef NS_ASSUME_NONNULL_BEGIN
+#define NS_ASSUME_NONNULL_BEGIN
+#endif
+
+#ifndef NS_ASSUME_NONNULL_END
+#define NS_ASSUME_NONNULL_END
+#endif
+
+#ifndef NS_DESIGNATED_INITIALIZER
+#define NS_DESIGNATED_INITIALIZER
+#endif
+
+#ifndef NS_UNAVAILABLE
+#define NS_UNAVAILABLE
+#endif

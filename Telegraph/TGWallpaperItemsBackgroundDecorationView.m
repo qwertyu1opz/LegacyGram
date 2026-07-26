@@ -1,0 +1,74 @@
+#import "TGWallpaperItemsBackgroundDecorationView.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/LegacyComponents.h"
+
+#import "TGPresentation.h"
+
+@interface TGWallpaperItemsBackgroundDecorationView ()
+{
+    UIView *_topSeparatorView;
+    UIView *_bottomSeparatorView;
+}
+
+@end
+
+@implementation TGWallpaperItemsBackgroundDecorationView
+
++ (NSString *)kind
+{
+    return @"TGWallpaperItemsBackgroundDecorationView";
+}
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self != nil)
+    {
+        self.backgroundColor = [UIColor whiteColor];
+        
+        CGFloat separatorHeight = TGScreenPixel;
+        
+        _topSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, frame.size.width, separatorHeight)];
+        _topSeparatorView.backgroundColor = TGSeparatorColor();
+        [self addSubview:_topSeparatorView];
+        
+        _bottomSeparatorView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, frame.size.height - separatorHeight, frame.size.width, separatorHeight)];
+        _bottomSeparatorView.backgroundColor = TGSeparatorColor();
+        [self addSubview:_bottomSeparatorView];
+    }
+    return self;
+}
+
+- (void)applyLayoutAttributes:(TGWallpaperItemsBackgroundDecorationAttributes *)layoutAttributes
+{
+    [super applyLayoutAttributes:layoutAttributes];
+    
+    [self setPresentation:layoutAttributes.presentation];
+}
+
+- (void)setPresentation:(TGPresentation *)presentation
+{    
+    self.backgroundColor = presentation.pallete.collectionMenuCellBackgroundColor;
+    _topSeparatorView.backgroundColor = presentation.pallete.collectionMenuSeparatorColor;
+    _bottomSeparatorView.backgroundColor = presentation.pallete.collectionMenuSeparatorColor;
+}
+
+- (void)layoutSubviews
+{
+    [super layoutSubviews];
+    
+    CGRect frame = self.frame;
+    
+    CGFloat separatorHeight = TGScreenPixel;
+    
+    _topSeparatorView.frame = CGRectMake(0.0f, 0.0f, frame.size.width, separatorHeight);
+    _bottomSeparatorView.frame = CGRectMake(0.0f, frame.size.height - separatorHeight, frame.size.width, separatorHeight);
+}
+
+@end
+
+
+@implementation TGWallpaperItemsBackgroundDecorationAttributes
+
+@end
+

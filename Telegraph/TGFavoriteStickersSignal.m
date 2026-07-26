@@ -1,0 +1,399 @@
+#import "TGFavoriteStickersSignal.h"
+
+#ifndef IOS6_NOOP_LOG
+#define IOS6_NOOP_LOG(...) do { } while (0)
+#endif
+
+#import <libkern/OSAtomic.h>
+
+#import "TGTelegraph.h"
+#import "TGAppDelegate.h"
+
+#import "TGTelegramNetworking.h"
+#import "TL/TLMetaScheme.h"
+
+#import "TGDocumentMediaAttachment+Telegraph.h"
+#import "TGMediaOriginInfo+Telegraph.h"
+
+#import "TGStickersSignals.h"
+#import "TGDownloadMessagesSignal.h"
+
+typedef enum {
+    TGStickerFaveActionFave,
+    TGStickerFaveActionUnfave
+} TGStickerFaveActionType;
+
+@interface TGStickerFaveAction : NSObject
+
+@property (nonatomic, strong, readonly) TGDocumentMediaAttachment *document;
+@property (nonatomic, readonly) TGStickerFaveActionType action;
+
+@end
+
+@implementation TGStickerFaveAction
+
+- (instancetype)initWithDocument:(TGDocumentMediaAttachment *)document action:(TGStickerFaveActionType)action {
+    self = [super init];
+    if (self != nil) {
+        _document = document;
+        _action = action;
+    }
+    return self;
+}
+
+@end
+
+static bool TGIOS6FavoriteStickerDocumentIsAnimated(TGDocumentMediaAttachment *document)
+{
+    if (![document isKindOfClass:[TGDocumentMediaAttachment class]])
+        return false;
+    
+    NSString *mimeType = [document.mimeType lowercaseString];
+    NSString *extension = [[document.fileName pathExtension] lowercaseString];
+    return [mimeType isEqualToString:@"application/x-tgsticker"] || [mimeType isEqualToString:@"video/webm"] || [extension isEqualToString:@"tgs"] || [extension isEqualToString:@"webm"];
+}
+
+static NSArray *TGIOS6FavoriteStaticStickerDocuments(NSArray *documents)
+{
+    if (![documents isKindOfClass:[NSArray class]])
+        return @[];
+    
+    NSMutableArray *result = [[NSMutableArray alloc] init];
+    NSUInteger skipped = 0;
+    for (TGDocumentMediaAttachment *document in documents)
+    {
+        if (TGIOS6FavoriteStickerDocumentIsAnimated(document))
+        {
+            skipped++;
+            continue;
+        }
+        [result addObject:document];
+    }
+    if (skipped != 0)
+        IOS6_NOOP_LOG(@"IOS6STICKER favorite.filterAnimated skipped=%d kept=%d", (int)skipped, (int)result.count);
+    return result;
+}
+
+@implementation TGFavoriteStickersSignal
+
++ (SQueue *)queue {
+    static SQueue *queue = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = [[SQueue alloc] init];
+    });
+    return queue;
+}
+
+static bool _syncedStickers = false;
+
++ (SVariable *)_favedStickers {
+    static SVariable *variable = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        variable = [[SVariable alloc] init];
+        [variable set:[self _loadFavedStickers]];
+    });
+    [[self queue] dispatch:^{
+        if (!_syncedStickers) {
+            _syncedStickers = true;
+            [self sync];
+        }
+    }];
+    return variable;
+}
+
++ (NSMutableArray *)_stickerActions {
+    static NSMutableArray *array = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        array = [[NSMutableArray alloc] init];
+    });
+    return array;
+}
+
+static OSSpinLock idsLock = OS_SPINLOCK_INIT;
+
++ (NSMutableArray *)_favedDocumentIds {
+    static NSMutableArray *array = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        array = [[NSMutableArray alloc] init];
+    });
+    return array;
+}
+
++ (NSInteger)maxFavedStickers {
+    NSData *data = [TGDatabaseInstance() customProperty:@"maxFavedStickers"];
+    int32_t value = 0;
+    
+    if (data.length >= 4) {
+        [data getBytes:&value length:4];
+    }
+    
+    return value <= 0 ? 30 : value;
+}
+
++ (int32_t)hashForDocumentsReverse:(NSArray *)documents {
+    uint32_t acc = 0;
+    
+    for (TGDocumentMediaAttachment *document in [documents reverseObjectEnumerator]) {
+        uint32_t low = (int32_t)(document.documentId & 0xffffffff);
+        uint32_t high = (int32_t)((document.documentId >> 32) & 0xffffffff);
+        acc = (acc * 20261) + high;
+        acc = (acc * 20261) + low;
+    }
+    return acc % 0x7FFFFFFF;
+}
+
++ (void)clearFavoriteStickers {
+    [[self queue] dispatch:^{
+        [self _storeFavedStickers:@[]];
+        [[self _favedStickers] set:[SSignal single:@[]]];
+        [[self _stickerActions] removeAllObjects];
+        _syncedStickers = false;
+    }];
+}
+
++ (void)sync {
+    if (TGTelegraphInstance.clientUserId != 0) {
+        [[self queue] dispatch:^{
+            [TGTelegraphInstance.genericTasksSignalManager startStandaloneSignalIfNotRunningForKey:@"syncFavedStickers" producer:^SSignal *{
+                return [self _syncFavedStickers];
+            }];
+        }];
+    }
+}
+
++ (void)_enqueueStickerAction:(TGStickerFaveAction *)action {
+    [[self queue] dispatch:^{
+        NSInteger index = -1;
+        for (TGStickerFaveAction *listAction in [self _stickerActions]) {
+            index++;
+            if (listAction.document.documentId == action.document.documentId) {
+                [[self _stickerActions] removeObjectAtIndex:index];
+                break;
+            }
+        }
+        
+        [[self _stickerActions] addObject:action];
+        
+        [self sync];
+    }];
+}
+
++ (SSignal *)_loadFavedStickers {
+    return [[[SSignal alloc] initWithGenerator:^id<SDisposable>(SSubscriber *subscriber) {
+        NSData *data = [NSData dataWithContentsOfFile:[self filePath]];
+
+        NSArray *array = nil;
+        @try {
+            array = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+        } @catch (NSException *e) {
+        }
+        
+        array = TGIOS6FavoriteStaticStickerDocuments(array);
+        [self syncFavedIds:array];
+        
+        if (array == nil) {
+            [subscriber putNext:@[]];
+            [subscriber putCompletion];
+        } else {
+            [subscriber putNext:array];
+            [subscriber putCompletion];
+        }
+        
+        return nil;
+    }] startOn:[self queue]];
+}
+
++ (SSignal *)remoteFavedStickers {
+    return [self _remoteFavedStickers:0];
+}
+
++ (SSignal *)_remoteFavedStickers:(int32_t)hash {
+    IOS6_NOOP_LOG(@"IOS6STICKER favorite.remote start hash=%d", hash);
+    
+    TLRPCmessages_getFavedStickers$messages_getFavedStickers *getFavedStickers = [[TLRPCmessages_getFavedStickers$messages_getFavedStickers alloc] init];
+    getFavedStickers.n_hash = hash;
+    
+    return [[[TGTelegramNetworking instance] requestSignal:getFavedStickers] mapToSignal:^SSignal *(id result) {
+        IOS6_NOOP_LOG(@"IOS6STICKER favorite.remote result=%@", NSStringFromClass([result class]));
+        if ([result isKindOfClass:[TLmessages_FavedStickers$messages_favedStickers class]]) {
+            TLmessages_FavedStickers$messages_favedStickers *favedStickers = result;
+            IOS6_NOOP_LOG(@"IOS6STICKER favorite.remote stickers=%d hash=%d", (int)favedStickers.stickers.count, favedStickers.n_hash);
+            
+            NSMutableArray *array = [[NSMutableArray alloc] init];
+            for (id desc in [favedStickers.stickers reverseObjectEnumerator]) {
+                TGDocumentMediaAttachment *document = [[TGDocumentMediaAttachment alloc] initWithTelegraphDocumentDesc:desc];
+                if (document.documentId != 0 && !TGIOS6FavoriteStickerDocumentIsAnimated(document)) {
+                    document.originInfo = [TGMediaOriginInfo mediaOriginInfoForDocumentFavoriteSticker:desc];
+                    [array addObject:document];
+                }
+            }
+            
+            int32_t localHash = [self hashForDocumentsReverse:array];
+            if (localHash != favedStickers.n_hash) {
+                TGLog(@"(TGFavoriteStickersSignal hash mismatch)");
+            }
+            
+            [self _storeFavedStickers:array];
+            
+            [[self _favedStickers] set:[SSignal single:array]];
+            
+            return [SSignal single:array];
+        } else {
+            return [SSignal single:nil];
+        }
+    }];
+}
+
++ (SSignal *)_syncFavedStickers {
+    return [[SSignal defer:^SSignal *{
+        NSArray *actions = [[NSArray alloc] initWithArray:[self _stickerActions]];
+        [[self _stickerActions] removeAllObjects];
+        
+        SSignal *actionsSignal = [SSignal complete];
+        
+        for (TGStickerFaveAction *action in actions) {
+            SSignal *(^faveStickerSignal)(TGMediaOriginInfo *) = ^SSignal *(TGMediaOriginInfo *originInfo)
+            {
+                TLRPCmessages_faveSticker$messages_faveSticker *faveSticker = [[TLRPCmessages_faveSticker$messages_faveSticker alloc] init];
+                TLInputDocument$inputDocument *inputDocument = [[TLInputDocument$inputDocument alloc] init];
+                inputDocument.n_id = action.document.documentId;
+                inputDocument.access_hash = action.document.accessHash;
+                inputDocument.file_reference = [originInfo fileReference];
+                faveSticker.n_id = inputDocument;
+                if (action.action == TGStickerFaveActionUnfave)
+                    faveSticker.unfave = true;
+                return [[TGTelegramNetworking instance] requestSignal:faveSticker];
+            };
+            
+            
+            SSignal *faveActionSignal = [faveStickerSignal(action.document.originInfo) catch:^SSignal *(id error) {
+                int32_t errorCode = [[TGTelegramNetworking instance] extractNetworkErrorCode:error];
+                NSString *errorText = [[TGTelegramNetworking instance] extractNetworkErrorType:error];
+                
+                if ([errorText hasPrefix:@"FILE_REFERENCE_"] && errorCode == 400 && action.document.originInfo != nil) {
+                    return [[TGDownloadMessagesSignal updatedOriginInfo:action.document.originInfo identifier:action.document.documentId] mapToSignal:^SSignal *(TGMediaOriginInfo *updatedOriginInfo) {
+                        return faveStickerSignal(updatedOriginInfo);
+                    }];
+                } else {
+                    return [SSignal fail:error];
+                }
+            }];
+            
+            actionsSignal = [actionsSignal then:[[faveActionSignal mapToSignal:^SSignal *(__unused id next) {
+                return [SSignal complete];
+            }] catch:^SSignal *(__unused id error) {
+                return [SSignal complete];
+            }]];
+        }
+        
+        return [[actionsSignal then:[[self _loadFavedStickers] mapToSignal:^SSignal *(NSArray *array) {
+            return [[self _remoteFavedStickers:[self hashForDocumentsReverse:array]] mapToSignal:^SSignal *(__unused id value) {
+                return [SSignal complete];
+            }];
+        }]] then:[[SSignal defer:^SSignal *{
+            if ([self _stickerActions].count == 0) {
+                return [SSignal complete];
+            } else {
+                return [self _syncFavedStickers];
+            }
+        }] startOn:[self queue]]];
+    }] startOn:[self queue]];
+}
+
++ (NSString *)filePath {
+    return [[TGAppDelegate documentsPath] stringByAppendingPathComponent:@"favedStickers.data"];
+}
+
++ (void)_storeFavedStickers:(NSArray *)array {
+    [[self queue] dispatch:^{
+        [self syncFavedIds:array];
+        
+        [[NSKeyedArchiver archivedDataWithRootObject:array] writeToFile:[self filePath] atomically:true];
+    }];
+}
+
++ (void)syncFavedIds:(NSArray *)array {
+    OSSpinLockLock(&idsLock);
+    
+    NSMutableArray *ids = [[NSMutableArray alloc] init];
+    [[self _favedDocumentIds] removeAllObjects];
+    for (TGDocumentMediaAttachment *document in array)
+    {
+        [ids addObject:@{@"documentId": @(document.documentId), @"dcId": @(document.datacenterId)}];
+    }
+    [[self _favedDocumentIds] addObjectsFromArray:ids];
+    OSSpinLockUnlock(&idsLock);
+}
+
++ (bool)isFaved:(TGDocumentMediaAttachment *)sticker
+{
+    bool faved = false;
+    OSSpinLockLock(&idsLock);
+    
+    NSNumber *documentId = @(sticker.documentId);
+    NSNumber *datacenterId = @(sticker.datacenterId);
+    for (NSDictionary *documentPair in [self _favedDocumentIds])
+    {
+        if ([documentPair[@"documentId"] isEqualToNumber:documentId] && [documentPair[@"dcId"] isEqualToNumber:datacenterId])
+        {
+            faved = true;
+            break;
+        }
+    }
+    
+    OSSpinLockUnlock(&idsLock);
+
+    return faved;
+}
+
++ (void)setSticker:(TGDocumentMediaAttachment *)document faved:(bool)faved
+{
+    if (document.documentId == 0 || (faved && TGIOS6FavoriteStickerDocumentIsAnimated(document))) {
+        return;
+    }
+    
+    SSignal *signal = [[[[self _favedStickers] signal] take:1] map:^id(NSArray *documents) {
+        NSMutableArray *updatedDocuments = [[NSMutableArray alloc] initWithArray:documents];
+        NSInteger index = -1;
+        int64_t documentId = document.documentId;
+        for (TGDocumentMediaAttachment *document in updatedDocuments) {
+            index++;
+            if (document.documentId == documentId) {
+                [updatedDocuments removeObjectAtIndex:index];
+                break;
+            }
+        }
+        if (faved)
+            [updatedDocuments addObject:document];
+        NSUInteger limit = [self maxFavedStickers];
+        if (updatedDocuments.count > limit) {
+            [updatedDocuments removeObjectsInRange:NSMakeRange(0, updatedDocuments.count - limit)];
+        }
+        
+        [self _storeFavedStickers:updatedDocuments];
+        
+        if (faved && [TGDatabaseInstance() stickerPackForReference:document.stickerPackReference] == nil)
+        {
+            [[TGStickersSignals stickerPackInfo:document.stickerPackReference] startWithNext:^(TGStickerPack *next) {
+                [TGDatabaseInstance() storeStickerPack:next forReference:next.packReference];
+            }];
+        }
+        
+        return updatedDocuments;
+    }];
+    [signal startWithNext:^(id next) {
+        [[self _favedStickers] set:[SSignal single:next]];
+    }];
+    
+    [self _enqueueStickerAction:[[TGStickerFaveAction alloc] initWithDocument:document action:faved ? TGStickerFaveActionFave : TGStickerFaveActionUnfave]];
+}
+
++ (SSignal *)favoriteStickers {
+    return [[self _favedStickers] signal];
+}
+
+@end

@@ -1,0 +1,5 @@
+TELEGRAM_APP_NAME=Telegram
+TELEGRAPH_BUNDLE_ID=com.example.LegacyGram
+TELEGRAM_APPSTORE_ID = @686449807
+
+#include "Common.xcconfig"

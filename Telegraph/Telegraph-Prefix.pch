@@ -1,0 +1,394 @@
+#ifdef __OBJC__
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#ifndef UIInterfaceOrientationUnknown
+#define UIInterfaceOrientationUnknown ((UIInterfaceOrientation)0)
+#endif
+#import "TGCommon.h"
+
+#ifdef TG_PUBLIC_BUILD
+#ifndef TG_PUBLIC_NSLOG_DISABLED
+#define TG_PUBLIC_NSLOG_DISABLED 1
+#define NSLog(...) do { } while (0)
+#endif
+#endif
+
+@interface NSArray (TGIOS6FirstObject)
+- (id)firstObject;
+@end
+#ifndef UIBackgroundFetchResult
+#define UIBackgroundFetchResult NSInteger
+#define UIBackgroundFetchResultNewData 0
+#define UIBackgroundFetchResultNoData 1
+#define UIBackgroundFetchResultFailed 2
+#ifndef UIApplicationOpenURLOptionsSourceApplicationKey
+#define UIApplicationOpenURLOptionsSourceApplicationKey UIApplicationLaunchOptionsSourceApplicationKey
+#endif
+
+@interface UIApplication (TGIOS6RemoteNotifications)
+- (void)registerForRemoteNotifications;
+@end
+
+@interface UILocalNotification (TGIOS8Category)
+@property (nonatomic, copy) NSString *category;
+@end
+
+@interface NSFileManager (TGIOS8AppGroups)
+- (NSURL *)containerURLForSecurityApplicationGroupIdentifier:(NSString *)groupIdentifier;
+@end
+#endif
+
+@class UIUserNotificationSettings;
+@class NSUserActivity;
+@class UIApplicationShortcutItem;
+
+@interface NSUserDefaults (TGIOS6SuiteName)
+- (id)initWithSuiteName:(NSString *)suiteName;
+@end
+
+@interface UIView (TGIOS6Snapshot)
+- (BOOL)drawViewHierarchyInRect:(CGRect)rect afterScreenUpdates:(BOOL)afterUpdates;
+- (UIView *)snapshotViewAfterScreenUpdates:(BOOL)afterUpdates;
+@end
+#ifndef UIApplicationOpenURLOptionsSourceApplicationKey
+#define UIApplicationOpenURLOptionsSourceApplicationKey UIApplicationLaunchOptionsSourceApplicationKey
+#endif
+
+@interface UIApplication (TGIOS6RemoteNotifications)
+- (void)registerForRemoteNotifications;
+@end
+
+@interface UILocalNotification (TGIOS8Category)
+@property (nonatomic, copy) NSString *category;
+@end
+
+@interface NSFileManager (TGIOS8AppGroups)
+- (NSURL *)containerURLForSecurityApplicationGroupIdentifier:(NSString *)groupIdentifier;
+@end
+
+
+#import <AVFoundation/AVFoundation.h>
+#import <CoreLocation/CoreLocation.h>
+
+#ifndef kCLAuthorizationStatusAuthorizedWhenInUse
+#define kCLAuthorizationStatusAuthorizedWhenInUse kCLAuthorizationStatusAuthorized
+#endif
+#ifndef kCLAuthorizationStatusAuthorizedAlways
+#define kCLAuthorizationStatusAuthorizedAlways kCLAuthorizationStatusAuthorized
+#endif
+
+#ifndef PKAddressFieldNone
+typedef NSUInteger PKAddressField;
+#define PKAddressFieldNone 0
+#define PKAddressFieldPostalAddress 1
+#endif
+
+#ifndef AVAuthorizationStatusAuthorized
+typedef NSInteger AVAuthorizationStatus;
+#define AVAuthorizationStatusNotDetermined 0
+#define AVAuthorizationStatusRestricted 1
+#define AVAuthorizationStatusDenied 2
+#define AVAuthorizationStatusAuthorized 3
+
+@interface AVCaptureDevice (TGIOS7AuthorizationDeclarations)
++ (AVAuthorizationStatus)authorizationStatusForMediaType:(NSString *)mediaType;
+@end
+
+@interface AVAudioSession (TGIOS7InputsDeclarations)
+@property (nonatomic, readonly) NSArray *availableInputs;
+- (void)requestRecordPermission:(void (^)(BOOL granted))response;
+@end
+#endif
+
+
+
+#ifndef NS_DESIGNATED_INITIALIZER
+#define NS_DESIGNATED_INITIALIZER
+#endif
+#ifndef NS_AVAILABLE_IOS
+#define NS_AVAILABLE_IOS(_ios)
+#endif
+@class PKPaymentRequest;
+@class PKPayment;
+
+#ifndef NSUnderlinePatternSolid
+#define NSUnderlinePatternSolid 0
+#endif
+#ifndef NSCalendarIdentifierGregorian
+#define NSCalendarIdentifierGregorian NSGregorianCalendar
+#endif
+#ifndef NSCalendarUnitYear
+#define NSCalendarUnitYear NSYearCalendarUnit
+#endif
+#ifndef NSCalendarUnitMonth
+#define NSCalendarUnitMonth NSMonthCalendarUnit
+#endif
+#ifndef NSCalendarUnitDay
+#define NSCalendarUnitDay NSDayCalendarUnit
+#endif
+#ifndef NSCalendarUnitHour
+#define NSCalendarUnitHour NSHourCalendarUnit
+#endif
+#ifndef NSCalendarUnitMinute
+#define NSCalendarUnitMinute NSMinuteCalendarUnit
+#endif
+#ifndef NSCalendarUnitSecond
+#define NSCalendarUnitSecond NSSecondCalendarUnit
+#endif
+
+@interface CLLocationManager (TGIOS8LocationDeclarations)
+@property(nonatomic) BOOL allowsBackgroundLocationUpdates;
+- (void)requestAlwaysAuthorization;
+- (void)requestLocation;
+@end
+
+@interface NSObject (TGOptionalSystemSelectorDeclarations)
+- (id)defaultReadingList;
+- (BOOL)addReadingListItemWithURL:(NSURL *)url title:(NSString *)title previewText:(NSString *)previewText error:(NSError **)error;
+- (void)setEffect:(id)effect;
+- (id)effectWithStyle:(NSInteger)style;
+- (id)summaryItemWithLabel:(NSString *)label amount:(NSDecimalNumber *)amount;
+- (NSDecimalNumber *)amount;
+- (BOOL)canMakePaymentsUsingNetworks:(NSArray *)supportedNetworks;
+@end
+
+static inline NSURL *TGFileURLWithPathRelativeToURL(NSString *path, NSURL *baseURL)
+{
+    if (baseURL.path.length != 0)
+        return [NSURL fileURLWithPath:[baseURL.path stringByAppendingPathComponent:path]];
+    return [NSURL fileURLWithPath:path];
+}
+
+@interface UIView (TGIOS7TintDeclarations)
+@property (nonatomic, retain) UIColor *tintColor;
+@end
+
+@interface UIFont (TGIOS7FontDescriptorDeclarations)
+- (id)fontDescriptor;
+@end
+
+@interface UIViewController (TGIOS7StatusBarUpdateDeclarations)
+- (void)setNeedsStatusBarAppearanceUpdate;
+@end
+
+@protocol UILayoutSupport <NSObject>
+@property (nonatomic, readonly) CGFloat length;
+@end
+
+@interface UIViewController (TGIOS7LayoutGuideDeclarations)
+@property(nonatomic, readonly, retain) id<UILayoutSupport> topLayoutGuide;
+@property(nonatomic, readonly, retain) id<UILayoutSupport> bottomLayoutGuide;
+@end
+
+
+
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < 70000
+@interface NSURLSessionConfiguration : NSObject
+@property (nonatomic, copy) NSDictionary *HTTPAdditionalHeaders;
++ (instancetype)defaultSessionConfiguration;
+@end
+
+@interface NSURLSessionTask : NSObject
+- (void)resume;
+- (void)cancel;
+@end
+
+@interface NSURLSessionDataTask : NSURLSessionTask
+@end
+
+@protocol NSURLSessionTaskDelegate
+@end
+
+@interface NSURLSession : NSObject
++ (instancetype)sessionWithConfiguration:(NSURLSessionConfiguration *)configuration;
++ (instancetype)sessionWithConfiguration:(NSURLSessionConfiguration *)configuration delegate:(id)delegate delegateQueue:(NSOperationQueue *)queue;
+- (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request;
+- (NSURLSessionDataTask *)dataTaskWithRequest:(NSURLRequest *)request completionHandler:(void (^)(NSData *data, NSURLResponse *response, NSError *error))completionHandler;
+- (NSURLSessionDataTask *)dataTaskWithURL:(NSURL *)url completionHandler:(void (^)(NSData *data, NSURLResponse *response, NSError *error))completionHandler;
+- (void)invalidateAndCancel;
+@end
+
+
+#ifndef NSDataBase64DecodingIgnoreUnknownCharacters
+typedef NSUInteger NSDataBase64DecodingOptions;
+#define NSDataBase64DecodingIgnoreUnknownCharacters 1
+@interface NSData (TGIOS7Base64Declarations)
+- (instancetype)initWithBase64EncodedString:(NSString *)base64String options:(NSDataBase64DecodingOptions)options;
+- (instancetype)initWithBase64Encoding:(NSString *)base64String;
+@end
+#endif
+
+@interface NSString (TGIOS7DrawingDeclarations)
+- (CGSize)sizeWithAttributes:(NSDictionary *)attrs;
+- (void)drawAtPoint:(CGPoint)point withAttributes:(NSDictionary *)attrs;
+- (void)drawWithRect:(CGRect)rect options:(NSInteger)options attributes:(NSDictionary *)attributes context:(id)context;
+@end
+#endif
+
+#ifndef NS_ASSUME_NONNULL_BEGIN
+#define NS_ASSUME_NONNULL_BEGIN
+#define NS_ASSUME_NONNULL_END
+#define nullable
+#define null_unspecified
+#define __nullable
+#define __nonnull
+#define _Nullable
+#define _Nonnull
+#endif
+
+#ifndef TG_IOS6_MORE_UIKIT_DECLS
+#define TG_IOS6_MORE_UIKIT_DECLS
+typedef NSUInteger UIKeyModifierFlags;
+typedef NSInteger UIScrollViewContentInsetAdjustmentBehavior;
+#define UIScrollViewContentInsetAdjustmentNever 2
+
+#ifndef UIUserInterfaceSizeClassCompact
+typedef NSInteger UIUserInterfaceSizeClass;
+#define UIUserInterfaceSizeClassUnspecified 0
+#define UIUserInterfaceSizeClassCompact 1
+#define UIUserInterfaceSizeClassRegular 2
+#endif
+#ifndef UISemanticContentAttributeUnspecified
+typedef NSInteger UISemanticContentAttribute;
+#define UISemanticContentAttributeUnspecified 0
+#endif
+
+@interface UIScrollView (TGIOS11InsetAdjustmentDeclarations)
+@property (nonatomic) UIScrollViewContentInsetAdjustmentBehavior contentInsetAdjustmentBehavior;
+@end
+
+@interface UIPopoverPresentationController : NSObject
+@property (nonatomic, retain) UIView *sourceView;
+@property (nonatomic) CGRect sourceRect;
+@property (nonatomic) NSUInteger permittedArrowDirections;
+@end
+
+@interface UIActivityViewController (TGIOS8PopoverDeclarations)
+@property (nonatomic, readonly) UIPopoverPresentationController *popoverPresentationController;
+@end
+
+@interface UITableView (TGIOS7SeparatorInsetDeclarations)
+@property (nonatomic) UIEdgeInsets separatorInset;
+@end
+
+@protocol UIViewControllerTransitionCoordinatorContext <NSObject>
+- (BOOL)isInteractive;
+- (BOOL)isCancelled;
+@end
+@protocol UIViewControllerTransitionCoordinator <NSObject>
+@property (nonatomic, readonly, getter=isCancelled) BOOL cancelled;
+- (BOOL)animateAlongsideTransition:(void (^)(id<UIViewControllerTransitionCoordinatorContext> context))animation completion:(void (^)(id<UIViewControllerTransitionCoordinatorContext> context))completion;
+@end
+@interface UIViewController (TGIOS7TransitionDeclarations)
+@property (nonatomic, readonly) id<UIViewControllerTransitionCoordinator> transitionCoordinator;
+@end
+@interface UINavigationController (TGIOS7InteractivePopDeclarations)
+@property (nonatomic, readonly) UIGestureRecognizer *interactivePopGestureRecognizer;
+@end
+
+#ifndef UIApplicationUserDidTakeScreenshotNotification
+#define UIApplicationUserDidTakeScreenshotNotification @"UIApplicationUserDidTakeScreenshotNotification"
+#endif
+
+#ifndef UIKeyInputUpArrow
+#define UIKeyInputUpArrow @"\uf700"
+#endif
+#ifndef UIKeyInputDownArrow
+#define UIKeyInputDownArrow @"\uf701"
+#endif
+
+
+@interface UIView (TGIOS7SnapshotDeclarations)
+- (UIView *)snapshotViewAfterScreenUpdates:(BOOL)afterUpdates;
+- (UIView *)resizableSnapshotViewFromRect:(CGRect)rect afterScreenUpdates:(BOOL)afterUpdates withCapInsets:(UIEdgeInsets)capInsets;
+@end
+
+@interface UIView (TGIOS9SemanticDeclarations)
+@property (nonatomic) UISemanticContentAttribute semanticContentAttribute;
++ (UIUserInterfaceLayoutDirection)userInterfaceLayoutDirectionForSemanticContentAttribute:(UISemanticContentAttribute)attribute;
+@end
+
+@interface UIKeyCommand : NSObject
+@property (nonatomic, readonly) NSString *input;
+@property (nonatomic, readonly) UIKeyModifierFlags modifierFlags;
++ (UIKeyCommand *)keyCommandWithInput:(NSString *)input modifierFlags:(UIKeyModifierFlags)modifierFlags action:(SEL)action;
+@end
+
+
+#ifndef UIScrollViewKeyboardDismissModeInteractive
+typedef NSInteger UIScrollViewKeyboardDismissMode;
+#define UIScrollViewKeyboardDismissModeNone 0
+#define UIScrollViewKeyboardDismissModeOnDrag 1
+#define UIScrollViewKeyboardDismissModeInteractive 2
+@interface UIScrollView (TGIOS7KeyboardDismissDeclarations)
+@property (nonatomic) UIScrollViewKeyboardDismissMode keyboardDismissMode;
+@end
+#endif
+
+#ifndef UIForceTouchCapabilityAvailable
+typedef NSInteger UIForceTouchCapability;
+#define UIForceTouchCapabilityUnknown 0
+#define UIForceTouchCapabilityUnavailable 1
+#define UIForceTouchCapabilityAvailable 2
+@interface UITraitCollection : NSObject
+@property (nonatomic, readonly) UIForceTouchCapability forceTouchCapability;
+@property (nonatomic, readonly) UIUserInterfaceSizeClass horizontalSizeClass;
+@end
+@protocol UIViewControllerPreviewing <NSObject>
+@property (nonatomic) CGRect sourceRect;
+@property (nonatomic, retain) UIView *sourceView;
+@end
+@interface UIViewController (TGIOSPreviewingDeclarations)
+@property (nonatomic) CGSize preferredContentSize;
+@property (nonatomic, readonly) UITraitCollection *traitCollection;
+- (id)registerForPreviewingWithDelegate:(id)delegate sourceView:(UIView *)sourceView;
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection;
+@end
+#endif
+@interface UIViewController (TGIOS7StatusBarDeclarations)
+- (BOOL)prefersStatusBarHidden;
+- (UIStatusBarStyle)preferredStatusBarStyle;
+@end
+#endif
+
+#ifndef TG_IOS6_UIVIEW_MODERN_DECLS
+#define TG_IOS6_UIVIEW_MODERN_DECLS
+typedef NSInteger UIImpactFeedbackStyle;
+#define UIImpactFeedbackStyleLight 0
+#define UIImpactFeedbackStyleMedium 1
+#define UIImpactFeedbackStyleHeavy 2
+
+@interface UIImpactFeedbackGenerator : NSObject
+- (instancetype)initWithStyle:(UIImpactFeedbackStyle)style;
+- (void)impactOccurred;
+- (void)prepare;
+@end
+
+#ifndef UIStatusBarStyleLightContent
+#define UIStatusBarStyleLightContent 1
+#endif
+
+@interface UIViewController (TGIOS7ScrollInsetDeclarations)
+- (void)setAutomaticallyAdjustsScrollViewInsets:(BOOL)value;
+@end
+
+
+@interface UIView (TGIOS11AccessibilityInvertColorsDeclarations)
+@property (nonatomic) BOOL accessibilityIgnoresInvertColors;
+@end
+@interface UIView (TGIOS6ModernAnimationDeclarations)
++ (void)performWithoutAnimation:(void (^)(void))actionsWithoutAnimation;
++ (void)animateWithDuration:(NSTimeInterval)duration delay:(NSTimeInterval)delay usingSpringWithDamping:(CGFloat)dampingRatio initialSpringVelocity:(CGFloat)velocity options:(UIViewAnimationOptions)options animations:(void (^)(void))animations completion:(void (^)(BOOL finished))completion;
+@end
+
+@interface NSObject (TGIOS6TextContainerInsetDeclarations)
+- (UIEdgeInsets)textContainerInset;
+- (void)setTextContainerInset:(UIEdgeInsets)inset;
+@end
+#endif
+
+#endif
+
+#ifndef UIKeyInputEscape
+#define UIKeyInputEscape @"\033"
+#endif

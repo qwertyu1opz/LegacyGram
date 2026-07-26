@@ -1,0 +1,100 @@
+#import "TGChangePhoneNumberHelpController.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/LegacyComponents.h"
+
+#import "TGDatabase.h"
+#import "TGTelegraph.h"
+#import "TGCustomAlertView.h"
+
+#import "TGChangePhoneNumberHelpView.h"
+
+#import "TGChangePhoneNumberNumberController.h"
+
+#import "TGDebugController.h"
+
+#import "TGAppDelegate.h"
+
+#import "TGPresentation.h"
+
+@interface TGChangePhoneNumberHelpController ()
+{
+    TGChangePhoneNumberHelpView *_view;
+}
+
+@end
+
+@implementation TGChangePhoneNumberHelpController
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self != nil)
+    {
+        self.title = [TGPhoneUtils formatPhone:[TGDatabaseInstance() loadUser:TGTelegraphInstance.clientUserId].phoneNumber forceInternational:false];
+        self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:TGLocalized(@"Common.Back") style:UIBarButtonItemStylePlain target:self action:@selector(backPressed)];
+        [self setLeftBarButtonItem:[[UIBarButtonItem alloc] initWithTitle:TGLocalized(@"Common.Cancel") style:UIBarButtonItemStylePlain target:self action:@selector(cancelPressed)]];
+    }
+    return self;
+}
+
+- (void)backPressed
+{
+    [self.navigationController popViewControllerAnimated:true];
+}
+
+- (void)cancelPressed
+{
+    [self.presentingViewController dismissViewControllerAnimated:true completion:nil];
+}
+
+- (void)loadView
+{
+    [super loadView];
+    
+    self.view.backgroundColor = self.presentation.pallete.collectionMenuBackgroundColor;
+    _view = [[TGChangePhoneNumberHelpView alloc] initWithFrame:self.view.bounds];
+    _view.presentation = self.presentation;
+    _view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    __weak TGChangePhoneNumberHelpController *weakSelf = self;
+    _view.changePhonePressed = ^
+    {
+        [TGCustomAlertView presentAlertWithTitle:nil message:TGLocalized(@"PhoneNumberHelp.Alert") cancelButtonTitle:TGLocalized(@"Common.Cancel") okButtonTitle:TGLocalized(@"Common.OK") completionBlock:^(bool okButtonPressed)
+        {
+            if (okButtonPressed)
+            {
+                __strong TGChangePhoneNumberHelpController *strongSelf = weakSelf;
+                if (strongSelf != nil)
+                {
+                    [strongSelf.navigationController pushViewController:[[TGChangePhoneNumberNumberController alloc] init] animated:true];
+                }
+            }
+        }];
+    };
+    
+    _view.debugPressed = ^
+    {
+        __strong TGChangePhoneNumberHelpController *strongSelf = weakSelf;
+        if (strongSelf != nil)
+        {
+            [strongSelf.presentingViewController dismissViewControllerAnimated:true completion:^
+            {
+                [TGAppDelegateInstance.rootController pushContentController:[[TGDebugController alloc] init]];
+            }];
+        }
+    };
+    [self.view addSubview:_view];
+    
+    if (![self _updateControllerInset:false])
+        [self controllerInsetUpdated:UIEdgeInsetsZero];
+}
+
+- (void)controllerInsetUpdated:(UIEdgeInsets)previousInset
+{
+    [super controllerInsetUpdated:previousInset];
+    
+    UIEdgeInsets cleanInsets = self.controllerInset;
+    cleanInsets.bottom = 0.0f;
+    [_view setInsets:cleanInsets];
+}
+
+@end

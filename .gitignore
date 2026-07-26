@@ -1,0 +1,60 @@
+# Xcode and build products
+build/
+DerivedData/
+*.xcarchive
+*.dSYM
+*.dSYM.zip
+*.ipa
+*.deb
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.hmap
+*.xcuserstate
+
+# Local secrets, signing assets and private configuration
+config.h
+*.mobileprovision
+*.provisionprofile
+*.p12
+*.pfx
+*.pem
+*.key
+*.csr
+*.cer
+.env
+.env.*
+!.env.example
+Config/PrivateConfig.*
+
+# Logs, crash reports and local diagnostics
+*.log
+*.crash
+*.ips
+*.trace
+
+# Local backups and editor files
+.DS_Store
+._*
+__MACOSX/
+CodexBackups/
+IconBackup-*/
+*.bak
+*.bak.*
+*.before-*
+*.after-*
+*.fat-backup
+*.orig
+*~
+
+# Local build helper output
+.bin/
+.theos/

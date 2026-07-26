@@ -1,0 +1,96 @@
+#import "TGStickerAssociatedInputPanelCell.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/LegacyComponents.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/TGImageView.h"
+
+@interface TGStickerAssociatedInputPanelCell ()
+{
+    TGImageView *_imageView;
+    NSString *_previousUri;
+    
+    bool _highlighted;
+}
+
+@end
+
+@implementation TGStickerAssociatedInputPanelCell
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self != nil)
+    {
+        _imageView = [[TGImageView alloc] initWithFrame:CGRectMake(3.0f - TGRetinaPixel, 3.0f, 64.0f, 64.0f)];
+        _imageView.contentMode = UIViewContentModeScaleAspectFit;
+        [self.contentView addSubview:_imageView];
+    }
+    return self;
+}
+
+- (void)prepareForReuse
+{
+    [super prepareForReuse];
+    
+    _previousUri = nil;
+    [_imageView reset];
+}
+
+- (void)setDocument:(TGDocumentMediaAttachment *)document
+{
+    _document = document;
+    
+    NSMutableString *uri = [[NSMutableString alloc] initWithString:@"sticker-preview://?"];
+    if (document.documentId != 0)
+    {
+        [uri appendFormat:@"documentId=%" PRId64 "", document.documentId];
+        
+        TGMediaOriginInfo *originInfo = document.originInfo ?: [TGMediaOriginInfo mediaOriginInfoForDocumentAttachment:document];
+        if (originInfo != nil)
+            [uri appendFormat:@"&origin_info=%@", [originInfo stringRepresentation]];
+    }
+    else
+    {
+        [uri appendFormat:@"localDocumentId=%" PRId64 "", document.localDocumentId];
+    }
+    [uri appendFormat:@"&accessHash=%" PRId64 "", document.accessHash];
+    [uri appendFormat:@"&datacenterId=%" PRId32 "", (int32_t)document.datacenterId];
+    
+    NSString *legacyThumbnailUri = [document.thumbnailInfo imageUrlForLargestSize:NULL];
+    if (legacyThumbnailUri != nil)
+        [uri appendFormat:@"&legacyThumbnailUri=%@", [TGStringUtils stringByEscapingForURL:legacyThumbnailUri]];
+    [uri appendFormat:@"&fileName=%@", [TGStringUtils stringByEscapingForURL:[document safeFileName]]];
+    [uri appendFormat:@"&size=%d", document.size];
+    if (document.mimeType.length != 0)
+        [uri appendFormat:@"&mimeType=%@", [TGStringUtils stringByEscapingForURL:document.mimeType]];
+    
+    [uri appendFormat:@"&width=128&height=128"];
+    [uri appendFormat:@"&highQuality=1"];
+    
+    if ([_previousUri isEqualToString:uri])
+        return;
+    
+    _previousUri = uri;
+    [_imageView loadUri:uri withOptions:nil];
+}
+
+- (void)setHighlighted:(bool)highlighted animated:(bool)__unused animated
+{
+    if (_highlighted != highlighted)
+    {
+        _highlighted = highlighted;
+        
+        if (iosMajorVersion() >= 8)
+        {
+            [UIView animateWithDuration:0.6 delay:0.0 usingSpringWithDamping:0.6f initialSpringVelocity:0.0f options:UIViewAnimationOptionBeginFromCurrentState animations:^
+            {
+                if (_highlighted)
+                    _imageView.transform = CGAffineTransformMakeScale(0.8f, 0.8f);
+                else
+                    _imageView.transform = CGAffineTransformIdentity;
+            } completion:nil];
+        }
+    }
+}
+
+@end

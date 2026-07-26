@@ -1,0 +1,44 @@
+"Share.Cancel" = "Annulla";
+"Share.Next" = "Avanti";
+"Share.OK" = "OK";
+"Share.Search" = "Cerca";
+"Share.Send" = "Invia";
+
+"Share.Title" = "Condividi";
+"Share.ShareWithPerson" = "Condividere con %@?";
+"Share.ShareWithGroup" = "Condividere con %@?";
+"Share.ShareWithMultiple" = "Condividere con %@ destinatari?";
+"Share.Sharing" = "Condivido...";
+
+"Share.PasscodeTitle" = "Codice";
+"Share.EnterPasscode" = "Inserisci codice";
+"Share.ErrorInvalidPasscode" = "Codice non valido";
+
+"Share.Select" = "Seleziona";
+"Share.Done" = "Fatto";
+
+"Share.AuthTitle" = "Accedi a Telegram";
+"Share.AuthText" = "Apri Telegram e accedi per condividere.";
+
+"Share.ChoosePhoneNumber" = "Scegli un numero da condividere";
+
+"Share.RecentSection" = "Recenti";
+"Share.RecentSectionClear" = "Pulisci";
+
+"Share.PeopleSection" = "Persone";
+
+"Share.TouchId" = "Inserisci il codice";
+
+"Share.AddCaption" = "Scrivi un commento...";
+
+"Share.PasscodeFailedAttempts_1" = "1 tentativo di codice fallito";
+"Share.PasscodeFailedAttempts_2" = "2 tentativi di codice falliti";
+"Share.PasscodeFailedAttempts_3_10" = "%@ tentativi di codice falliti";
+"Share.PasscodeFailedAttempts_any" = "%@ tentativo di codice fallito";
+"Share.PasscodeTryAgainIn1Minute" = "Riprova tra 1 minuto";
+
+"Share.SavedMessages" = "Messaggi salvati";
+
+"Share.ContactInfo" = "Info contatto";
+"Share.ContactJob" = "lavoro";
+"Share.ContactBirthday" = "compleanno";

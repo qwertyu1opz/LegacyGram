@@ -1,0 +1,52 @@
+#import "TGGenericPeerMediaGalleryDeleteAccessoryView.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/TGImageUtils.h"
+#import "../submodules/LegacyComponents/LegacyComponents/TGModernGalleryItem.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/TGModernButton.h"
+
+@interface TGGenericPeerMediaGalleryDeleteAccessoryView ()
+{
+    TGModernButton *_button;
+    id<TGModernGalleryItem> _item;
+}
+
+@end
+
+@implementation TGGenericPeerMediaGalleryDeleteAccessoryView
+
+- (instancetype)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self != nil)
+    {
+        UIImage *actionImage = TGImageNamed(@"DeleteWhiteIcon.png");
+        _button = [[TGModernButton alloc] init];
+        _button.modernHighlight = true;
+        _button.exclusiveTouch = true;
+        [_button setImage:actionImage forState:UIControlStateNormal];
+        [_button addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:_button];
+    }
+    return self;
+}
+
+- (void)setFrame:(CGRect)frame
+{
+    [super setFrame:frame];
+    
+    _button.frame = (CGRect){CGPointZero, frame.size};
+}
+
+- (void)setItem:(id<TGModernGalleryItem>)item
+{
+    _item = item;
+}
+
+- (void)buttonPressed
+{
+    if (_item != nil && _action)
+        _action(_item);
+}
+
+@end

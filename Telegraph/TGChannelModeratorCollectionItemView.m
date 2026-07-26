@@ -1,0 +1,105 @@
+#import "TGChannelModeratorCollectionItemView.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/LegacyComponents.h"
+
+#import "../submodules/LegacyComponents/LegacyComponents/TGLetteredAvatarView.h"
+
+#import "TGPresentation.h"
+
+@interface TGChannelModeratorCollectionItemView () {
+    TGLetteredAvatarView *_avatarView;
+    UILabel *_nameLabel;
+    UILabel *_statusLabel;
+}
+
+@end
+
+@implementation TGChannelModeratorCollectionItemView
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self != nil) {
+        _avatarView = [[TGLetteredAvatarView alloc] initWithFrame:CGRectMake(15.0f, 10.0f, 66.0f, 66.0f)];
+        [_avatarView setSingleFontSize:28.0f doubleFontSize:28.0f useBoldFont:false];
+        [self.contentView addSubview:_avatarView];
+        
+        _nameLabel = [[UILabel alloc] init];
+        _nameLabel.textColor = [UIColor blackColor];
+        _nameLabel.backgroundColor = [UIColor clearColor];
+        _nameLabel.font = TGMediumSystemFontOfSize(20.0f);
+        [self.contentView addSubview:_nameLabel];
+        
+        _statusLabel = [[UILabel alloc] init];
+        _statusLabel.backgroundColor = [UIColor clearColor];
+        _statusLabel.font = TGSystemFontOfSize(15.0f);
+        [self.contentView addSubview:_statusLabel];
+    }
+    return self;
+}
+
+- (void)setPresentation:(TGPresentation *)presentation
+{
+    [super setPresentation:presentation];
+    
+    _nameLabel.textColor = presentation.pallete.collectionMenuTextColor;
+}
+
+- (NSString *)_statusStringFromUserPresence:(TGUserPresence)presence active:(out bool *)active
+{
+    if (presence.online)
+    {
+        if (active != NULL)
+           *active = true;
+        return TGLocalized(@"Presence.online");
+    }
+    else if (presence.lastSeen != 0)
+        return [TGDateUtils stringForRelativeLastSeen:presence.lastSeen];
+    
+    return TGLocalized(@"Presence.offline");
+}
+
+- (void)setUser:(TGUser *)user {
+    _nameLabel.text = user.displayName;
+
+    bool active = false;
+    NSString *status = [self _statusStringFromUserPresence:user.presence active:&active];
+    if (user.kind == TGUserKindBot || user.kind == TGUserKindSmartBot) {
+        status = TGLocalized(@"Bot.GenericBotStatus");
+    }
+    
+    _statusLabel.text = status;
+    if (active) {
+        _statusLabel.textColor = self.presentation.pallete.collectionMenuAccentColor;
+    } else {
+        _statusLabel.textColor = self.presentation.pallete.collectionMenuVariantColor;
+    }
+    
+    NSString *avatarUri = user.photoFullUrlSmall;
+    CGSize size = CGSizeMake(66.0f, 66.0f);
+    
+    UIImage *placeholder = [self.presentation.images avatarPlaceholderWithDiameter:66.0f];
+    
+    if (avatarUri.length == 0)
+        [_avatarView loadUserPlaceholderWithSize:size uid:user.uid firstName:user.firstName lastName:user.lastName placeholder:placeholder];
+    else if (!TGStringCompare([_avatarView currentUrl], avatarUri))
+        [_avatarView loadImage:avatarUri filter:@"circle:66x66" placeholder:placeholder];
+    
+    [self setNeedsLayout];
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    _avatarView.frame = CGRectMake(15.0f + self.safeAreaInset.left, 10.0f, 66.0f, 66.0f);
+    
+    CGFloat maxWidth = self.bounds.size.width - 92.0f - 18.0f - self.safeAreaInset.left - self.safeAreaInset.right;
+    CGSize nameSize = [_nameLabel sizeThatFits:CGSizeMake(maxWidth, CGFLOAT_MAX)];
+    nameSize.width = MIN(maxWidth, nameSize.width);
+    CGSize statusSize = [_statusLabel sizeThatFits:CGSizeMake(maxWidth, CGFLOAT_MAX)];
+    statusSize.width = MIN(maxWidth, statusSize.width);
+    
+    _nameLabel.frame = CGRectMake(92.0f + self.safeAreaInset.left, 21.0f, nameSize.width, nameSize.height);
+    _statusLabel.frame = CGRectMake(92.0f + self.safeAreaInset.left, 47.0f, statusSize.width, statusSize.height);
+}
+
+@end

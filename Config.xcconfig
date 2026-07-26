@@ -1,0 +1,6 @@
+TELEGRAM_APP_VERSION = 0.01
+TELEGRAM_APP_NAME = LegacyGram
+TELEGRAPH_BUNDLE_ID=com.example.LegacyGram
+TELEGRAM_APPSTORE_ID = @686449807
+
+#include "Common.xcconfig"
