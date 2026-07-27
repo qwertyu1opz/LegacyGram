@@ -63,6 +63,7 @@ typedef enum {
         _about = [coder decodeStringForCKey:"a"];
         _photoFileReferenceSmall = [coder decodeDataCorCKey:"frs"];
         _photoFileReferenceBig = [coder decodeDataCorCKey:"frb"];
+        _emojiStatusDocumentId = [coder decodeInt64ForCKey:"esd"];
     }
     return self;
 }
@@ -83,6 +84,7 @@ typedef enum {
     [coder encodeString:_about forCKey:"a"];
     [coder encodeData:_photoFileReferenceSmall forCKey:"frs"];
     [coder encodeData:_photoFileReferenceBig forCKey:"frb"];
+    [coder encodeInt64:_emojiStatusDocumentId forCKey:"esd"];
 }
 
 - (id)copyWithZone:(NSZone *)__unused zone
@@ -105,6 +107,7 @@ typedef enum {
     user.photoFileReferenceBig = _photoFileReferenceBig;
     user.presence = _presence;
     user.customProperties = _customProperties;
+    user.emojiStatusDocumentId = _emojiStatusDocumentId;
     user.contactId = _contactId;
     user->_contactIdInitialized = _contactIdInitialized;
     user->_formattedPhoneInitialized = _formattedPhoneInitialized;

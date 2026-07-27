@@ -1,6 +1,9 @@
 #import "NSOutputStream+TL.h"
 
-#import <endian.h>
+#import <machine/endian.h>
+#define __BYTE_ORDER __DARWIN_BYTE_ORDER
+#define __LITTLE_ENDIAN __DARWIN_LITTLE_ENDIAN
+#define __BIG_ENDIAN __DARWIN_BIG_ENDIAN
 
 static inline int roundUp(int numToRound, int multiple)
 {

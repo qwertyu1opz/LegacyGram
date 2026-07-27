@@ -120,7 +120,7 @@
     if (avatarUri.length == 0) {
         [_avatarView loadGroupPlaceholderWithSize:CGSizeMake(40.0f, 40.0f) conversationId:_conversation.conversationId title:_conversation.chatTitle placeholder:placeholder];
     } else if (!TGStringCompare([_avatarView currentUrl], avatarUri)) {
-        [_avatarView loadImage:avatarUri filter:@"circle:40x40" placeholder:placeholder];
+        [_avatarView loadImage:avatarUri filter:nil placeholder:placeholder];
     }
 }
 

@@ -33,7 +33,9 @@
         _label = [[TGGradientLabel alloc] init];
         _label.backgroundColor = [UIColor clearColor];
         [self addSubview:_label];
-    }
+        self.layer.cornerRadius = 7.0f;
+        self.layer.masksToBounds = true;
+   }
     return self;
 }
 
@@ -189,7 +191,7 @@ static bool isEmojiCharacter(NSString *singleChar)
     if (!TGStringCompare([self currentUrl], placeholderUri))
         [super loadImage:placeholderUri filter:nil placeholder:placeholder];
     
-    _label.hidden = false;
+    _label.hidden = [[NSUserDefaults standardUserDefaults] boolForKey:@"TGClassicIOS6Style"];
 }
 
 typedef struct
@@ -219,7 +221,7 @@ typedef struct
     
     [super loadImage:[[NSString alloc] initWithFormat:@"placeholder://?type=group-avatar&w=%d&h=%d&cid=%" PRId64 "", (int)size.width, (int)size.height, conversationId] filter:nil placeholder:placeholder];
     
-    _label.hidden = false;
+    _label.hidden = [[NSUserDefaults standardUserDefaults] boolForKey:@"TGClassicIOS6Style"];
 }
 
 - (void)layoutSubviews

@@ -22,6 +22,12 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
     return image;
 }
 
+static UIImage *TGMainTabsClassicIOS6ResizableImage(NSString *name)
+{
+    UIImage *image = TGMainTabsClassicIOS6Image(name);
+    return image == nil ? nil : [image resizableImageWithCapInsets:UIEdgeInsetsMake(0.0f, 1.0f, 0.0f, 1.0f)];
+}
+
 @protocol TGTabBarDelegate <NSObject>
 
 - (void)tabBarSelectedItem:(int)index;
@@ -70,8 +76,22 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
 
 - (void)setPresentation:(TGPresentation *)presentation
 {
-    _backgroundView.image = presentation.images.tabBarBadgeImage;
-    _label.textColor = presentation.pallete.tabBadgeTextColor;
+    if ([TGPresentation classicIOS6Style])
+    {
+        _backgroundView.image = [TGMainTabsClassicIOS6Image(@"TabBarBadge") resizableImageWithCapInsets:UIEdgeInsetsMake(0.0f, 10.0f, 0.0f, 10.0f)];
+        _label.font = TGBoldSystemFontOfSize(12.0f);
+        _label.textColor = [UIColor whiteColor];
+        _label.shadowColor = UIColorRGBA(0x000000, 0.85f);
+        _label.shadowOffset = CGSizeMake(0.0f, -1.0f);
+    }
+    else
+    {
+        _backgroundView.image = presentation.images.tabBarBadgeImage;
+        _label.font = TGSystemFontOfSize(13.0f);
+        _label.textColor = presentation.pallete.tabBadgeTextColor;
+        _label.shadowColor = [UIColor clearColor];
+        _label.shadowOffset = CGSizeZero;
+    }
 }
 
 - (void)setCount:(int)count
@@ -104,7 +124,7 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
         
         CGRect frame = _backgroundView.frame;
         CGFloat textWidth = CGCeil(_label.frame.size.width);
-        frame.size.width = count < 10 ? 20.0f : MAX(20.0f, textWidth + 12.0f + TGScreenPixel * 2.0f);
+        frame.size.width = count < 10 ? 20.0f : MAX(20.0f, textWidth + 10.0f + TGScreenPixel * 2.0f);
         frame.size.height = 20.0f;
         frame.origin.x = _backgroundView.superview.frame.size.width - frame.size.width - 1.0f;
         frame.origin.y = -1.0f;
@@ -112,7 +132,7 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
         
         CGRect labelFrame = _label.frame;
         labelFrame.origin.x = frame.origin.x;
-        labelFrame.origin.y = 1;
+        labelFrame.origin.y = [TGPresentation classicIOS6Style] ? 0.0f : 1.0f;
         labelFrame.size.width = frame.size.width;
         _label.frame = labelFrame;
     }
@@ -153,9 +173,11 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
         
         _label = [[UILabel alloc] init];
         _label.backgroundColor = [UIColor clearColor];
-        _label.textColor = presentation.pallete.tabTextColor;
-        _label.highlightedTextColor = presentation.pallete.tabActiveIconColor;
-        _label.font = [TGTabBarButton labelFont];
+        _label.textColor = [TGPresentation classicIOS6Style] ? UIColorRGB(0xc7c9cb) : presentation.pallete.tabTextColor;
+        _label.highlightedTextColor = [TGPresentation classicIOS6Style] ? UIColorRGB(0xffffff) : presentation.pallete.tabActiveIconColor;
+        _label.shadowColor = [TGPresentation classicIOS6Style] ? UIColorRGBA(0x000000, 0.85f) : [UIColor clearColor];
+        _label.shadowOffset = [TGPresentation classicIOS6Style] ? CGSizeMake(0.0f, -1.0f) : CGSizeZero;
+        _label.font = [TGPresentation classicIOS6Style] ? TGBoldSystemFontOfSize(TGIsPad() ? 11.0f : 10.0f) : [TGTabBarButton labelFont];
         _label.text = title;
         _label.textAlignment = NSTextAlignmentLeft;
         [_label sizeToFit];
@@ -178,8 +200,11 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
     else
         _imageView.highlightedImage = nil;
     
-    _label.textColor = presentation.pallete.tabTextColor;
-    _label.highlightedTextColor = presentation.pallete.tabActiveIconColor;
+    _label.textColor = [TGPresentation classicIOS6Style] ? UIColorRGB(0xc7c9cb) : presentation.pallete.tabTextColor;
+    _label.highlightedTextColor = [TGPresentation classicIOS6Style] ? UIColorRGB(0xffffff) : presentation.pallete.tabActiveIconColor;
+    _label.shadowColor = [TGPresentation classicIOS6Style] ? UIColorRGBA(0x000000, 0.85f) : [UIColor clearColor];
+    _label.shadowOffset = [TGPresentation classicIOS6Style] ? CGSizeMake(0.0f, -1.0f) : CGSizeZero;
+    [self setNeedsLayout];
 }
 
 - (void)setClassicSelectedImage:(UIImage *)image
@@ -188,8 +213,10 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
     if (_classicSelectedImage != nil && _classicSelectionLayer == nil)
     {
         _classicSelectionLayer = [CAGradientLayer layer];
-        _classicSelectionLayer.colors = @[(id)UIColorRGBA(0xffffff, 0.16f).CGColor, (id)UIColorRGBA(0x000000, 0.10f).CGColor];
-        _classicSelectionLayer.locations = @[@0.0f, @1.0f];
+        UIImage *selectionImage = TGMainTabsClassicIOS6ResizableImage(@"TabBarSelected");
+        _classicSelectionLayer.contents = (id)selectionImage.CGImage;
+        _classicSelectionLayer.contentsScale = selectionImage.scale;
+        _classicSelectionLayer.contentsGravity = kCAGravityResize;
         [self.layer insertSublayer:_classicSelectionLayer atIndex:0];
     }
     _classicSelectionLayer.hidden = _classicSelectedImage == nil || !_selected;
@@ -217,7 +244,7 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
     
     if (_landscape)
     {
-        _label.font = [TGTabBarButton landscapeLabelFont];
+        _label.font = [TGPresentation classicIOS6Style] ? TGBoldSystemFontOfSize(12.0f) : [TGTabBarButton landscapeLabelFont];
         if (CGAffineTransformIsIdentity(_imageView.transform))
         {
             [UIView animateWithDuration:0.2 animations:^
@@ -234,7 +261,7 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
     }
     else
     {
-        _label.font = [TGTabBarButton labelFont];
+        _label.font = [TGPresentation classicIOS6Style] ? TGBoldSystemFontOfSize(TGIsPad() ? 11.0f : 10.0f) : [TGTabBarButton labelFont];
         if (!CGAffineTransformIsIdentity(_imageView.transform))
         {
             [UIView animateWithDuration:0.2 animations:^
@@ -321,7 +348,7 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
     NSNumber *_unreadArrowUp;
     int _callsCount;
     int _messagesCount;
-    CAGradientLayer *_classicIOS6GradientLayer;
+    UIImageView *_classicIOS6BackgroundView;
 }
 
 @property (nonatomic, weak) id<TGTabBarDelegate> tabDelegate;
@@ -364,10 +391,8 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
         if ([TGPresentation classicIOS6Style])
         {
             _backgroundView.backgroundColor = [UIColor clearColor];
-            _classicIOS6GradientLayer = [CAGradientLayer layer];
-            _classicIOS6GradientLayer.colors = @[(id)UIColorRGB(0x686c70).CGColor, (id)UIColorRGB(0x34373b).CGColor, (id)UIColorRGB(0x17191c).CGColor, (id)UIColorRGB(0x050607).CGColor];
-            _classicIOS6GradientLayer.locations = @[@0.0f, @0.10f, @0.55f, @1.0f];
-            [_backgroundView.layer insertSublayer:_classicIOS6GradientLayer atIndex:0];
+            _classicIOS6BackgroundView = [[UIImageView alloc] initWithImage:TGMainTabsClassicIOS6ResizableImage(@"TabBarBackground")];
+            [_backgroundView addSubview:_classicIOS6BackgroundView];
         }
         else
             _backgroundView.backgroundColor = presentation.pallete.barBackgroundColor;
@@ -424,20 +449,22 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
 
     if ([TGPresentation classicIOS6Style])
     {
-        if (_classicIOS6GradientLayer == nil)
+        if (_classicIOS6BackgroundView == nil)
         {
-            _classicIOS6GradientLayer = [CAGradientLayer layer];
-            _classicIOS6GradientLayer.colors = @[(id)UIColorRGB(0x686c70).CGColor, (id)UIColorRGB(0x34373b).CGColor, (id)UIColorRGB(0x17191c).CGColor, (id)UIColorRGB(0x050607).CGColor];
-            _classicIOS6GradientLayer.locations = @[@0.0f, @0.10f, @0.55f, @1.0f];
-            [_backgroundView.layer insertSublayer:_classicIOS6GradientLayer atIndex:0];
+            _classicIOS6BackgroundView = [[UIImageView alloc] initWithImage:TGMainTabsClassicIOS6ResizableImage(@"TabBarBackground")];
+            [_backgroundView addSubview:_classicIOS6BackgroundView];
         }
-        _classicIOS6GradientLayer.hidden = false;
+        _classicIOS6BackgroundView.hidden = false;
         _backgroundView.backgroundColor = [UIColor clearColor];
+        // The original Telegram layout has three tabs; Calls is a newer feature.
+        _callsHidden = true;
+        _callsButton.alpha = 0.0f;
+        _callsButton.hidden = true;
         _stripeView.backgroundColor = UIColorRGB(0xa4a8ac);
     }
     else
     {
-        _classicIOS6GradientLayer.hidden = true;
+        _classicIOS6BackgroundView.hidden = true;
         _backgroundView.backgroundColor = presentation.pallete.barBackgroundColor;
         _stripeView.backgroundColor = presentation.pallete.barSeparatorColor;
     }
@@ -666,8 +693,8 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
     CGSize viewSize = self.frame.size;
     
     _backgroundView.frame = CGRectMake(0, 0, viewSize.width, viewSize.height);
-    if (_classicIOS6GradientLayer != nil)
-        _classicIOS6GradientLayer.frame = _backgroundView.bounds;
+    if (_classicIOS6BackgroundView != nil)
+        _classicIOS6BackgroundView.frame = _backgroundView.bounds;
     CGFloat stripeHeight = TGScreenPixel;
     _stripeView.frame = CGRectMake(0, [TGPresentation classicIOS6Style] ? 0.0f : -stripeHeight, viewSize.width, stripeHeight);
     
@@ -985,6 +1012,8 @@ static UIImage *TGMainTabsClassicIOS6Image(NSString *name)
 
 - (void)setCallsHidden:(bool)hidden animated:(bool)animated
 {
+    if ([TGPresentation classicIOS6Style])
+        hidden = true;
     _callsHidden = hidden;
     [_customTabBar setCallsTabHidden:hidden animated:animated];
 }

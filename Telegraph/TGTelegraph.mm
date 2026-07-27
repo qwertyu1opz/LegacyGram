@@ -291,8 +291,6 @@ static NSArray *TGIOS6ArchivePeerIdsFromDialogs(TLmessages_Dialogs *dialogs)
             continue;
         
         TLDialog$dialogMeta *dialog = (TLDialog$dialogMeta *)baseDialog;
-        if (dialog.folder_id != 1)
-            continue;
         
         int64_t peerId = TGIOS6ArchivePeerIdAndType(dialog.peer, NULL, NULL);
         if (peerId == 0)
@@ -2791,7 +2789,7 @@ static int64_t TGIOS6ModernUserIdFromStoredUser(TGUser *user, int32_t uid)
         registerDevice.flags = 0;
         registerDevice.token_type = 1;
         registerDevice.token = deviceToken;
-#if defined(DEBUG) || defined(TELE6RAM_APNS_SANDBOX)
+#if defined(DEBUG) || defined(LEGACYGRAM_APNS_SANDBOX)
         registerDevice.app_sandbox = true;
 #else
         registerDevice.app_sandbox = false;
@@ -3068,8 +3066,17 @@ static int64_t TGIOS6ModernUserIdFromStoredUser(TGUser *user, int32_t uid)
             bool initialMainFolderRequest = requestArchive && folderId == 0 && offset.date == 0 && offset.peerId == 0 && offset.messageId == 0;
             if (initialMainFolderRequest)
             {
-                TGLog(@"IOS6ARCHIVE startup archive lazy: main builder immediately count=%d", (int)dialogs.dialogs.count);
-                [requestBuilder dialogListRequestSuccess:dialogs];
+                TGLog(@"IOS6ARCHIVE startup archive refresh before main list count=%d", (int)dialogs.dialogs.count);
+                TGDialogListRemoteOffset *archiveOffset = [[TGDialogListRemoteOffset alloc] initWithDate:0 peerId:0 accessHash:0 messageId:0];
+                [self doRequestDialogsListWithOffset:archiveOffset limit:200 folderId:1 requestArchive:false requestBuilder:nil completion:^(TLmessages_Dialogs *archiveDialogs)
+                {
+                    TGIOS6StoreArchivePeerIds(archiveDialogs, @"startup");
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"TGIOS6ArchivePeerIdsUpdated" object:nil];
+                    [requestBuilder dialogListRequestSuccess:dialogs];
+                } failure:^
+                {
+                    [requestBuilder dialogListRequestSuccess:dialogs];
+                }];
             }
             else if (requestBuilder != nil)
             {

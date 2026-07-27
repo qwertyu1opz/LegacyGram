@@ -623,7 +623,7 @@
 "Notifications.Title" = "الإشعارات";
 "Notifications.BackgroundNotificationsHeader" = "الإشعارات في الخلفية";
 "Notifications.BackgroundNotifications" = "إشعارات الخلفية";
-"Notifications.BackgroundNotificationsHelp" = "عند إيقافها، يغلق Tele6ram الاتصال في الخلفية ولا يعرض إشعارات خارج التطبيق.";
+"Notifications.BackgroundNotificationsHelp" = "عند إيقافها، يغلق LegacyGram الاتصال في الخلفية ولا يعرض إشعارات خارج التطبيق.";
 "Notifications.MessageNotifications" = "إشعارات الرسائل";
 "Notifications.MessageNotificationsAlert" = "التنبيه";
 "Notifications.MessageNotificationsPreview" = "معاينة الرسائل";
@@ -2508,3 +2508,7 @@
 "Privacy.PaymentsClearInfoHelp" = "يمكنك حذف معلومات الشحن الخاصة بك والطلب من جميع موفري خدمة الدفع حذف بطاقاتك الإئتمانية المسجلة. يرجى الأخذ بالعلم أن تيليجرام لا يقوم بتاتًا بحفظ بيانات بطاقتك الإئتمانية.";
 "Privacy.PaymentsClear.PaymentInfo" = "معلومات عملية الدفع";
 "Privacy.PaymentsClear.ShippingInfo" = "معلومات الشحن";
+"Settings.Donate" = "Donate";
+"Settings.DonateInfo" = "Support LegacyGram to help maintain and improve the app. Choose any amount on the donation page; every contribution is optional and appreciated.";
+"Settings.DonateButton" = "Open donation page";
+

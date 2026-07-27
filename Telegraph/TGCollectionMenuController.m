@@ -7,6 +7,22 @@
 #import "TGCollectionMenuView.h"
 #import "TGCollectionMenuLayout.h"
 
+static UIColor *TGCollectionMenuClassicIOS6BackgroundColor(void)
+{
+    static UIColor *color = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^
+    {
+        NSString *resourceName = [UIScreen mainScreen].scale > 1.5f ? @"SettingsBackground@2x" : @"SettingsBackground";
+        NSString *path = [[NSBundle mainBundle] pathForResource:resourceName ofType:@"png" inDirectory:@"ClassicIOS6"];
+        UIImage *image = path.length == 0 ? nil : [UIImage imageWithContentsOfFile:path];
+        if (image != nil && [UIScreen mainScreen].scale > 1.5f && image.CGImage != NULL)
+            image = [UIImage imageWithCGImage:image.CGImage scale:2.0f orientation:UIImageOrientationUp];
+        color = image == nil ? UIColorRGB(0xc9d4dd) : [UIColor colorWithPatternImage:image];
+    });
+    return color;
+}
+
 @interface TGCollectionMenuSection ()
 
 - (void)insertItem:(TGCollectionItem *)item atIndex:(NSUInteger)index;
@@ -147,7 +163,7 @@
     _presentation = presentation;
     
     if ([self isViewLoaded])
-        self.view.backgroundColor = _presentation.pallete.collectionMenuBackgroundColor;
+        self.view.backgroundColor = [TGPresentation classicIOS6Style] ? TGCollectionMenuClassicIOS6BackgroundColor() : _presentation.pallete.collectionMenuBackgroundColor;
     
     for (TGCollectionMenuSection *section in _menuSections.sections)
     {
@@ -239,7 +255,7 @@
         self.view.frame = self.navigationController.view.bounds;
     }
     
-    self.view.backgroundColor = _presentation.pallete.collectionMenuBackgroundColor;
+    self.view.backgroundColor = [TGPresentation classicIOS6Style] ? TGCollectionMenuClassicIOS6BackgroundColor() : _presentation.pallete.collectionMenuBackgroundColor;
     
     _headerBackgroundView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.view.frame.size.width, self.controllerInset.top)];
     _headerBackgroundView.backgroundColor = self.view.backgroundColor;

@@ -517,14 +517,14 @@
 "Notifications.Title" = "Уведомления";
 "Notifications.BackgroundNotificationsHeader" = "ФОНОВАЯ ДОСТАВКА";
 "Notifications.BackgroundNotifications" = "Фоновые уведомления";
-"Notifications.BackgroundNotificationsHelp" = "Если выключено, Tele6ram закрывает фоновое соединение и не показывает уведомления вне приложения.";
+"Notifications.BackgroundNotificationsHelp" = "Если выключено, LegacyGram закрывает фоновое соединение и не показывает уведомления вне приложения.";
 "Notifications.ApplePushNotifications" = "Apple Push (APNs)";
-"Notifications.ApplePushNotificationsHelp" = "Надёжно доставляет системные push-уведомления, даже когда Tele6ram спит. Доступно пользователям Premium.";
+"Notifications.ApplePushNotificationsHelp" = "Надёжно доставляет системные push-уведомления, даже когда LegacyGram спит. Доступно пользователям Premium.";
 "PremiumFeature.Title" = "Премиум-функция";
 "PremiumFeature.GroupHelp" = "Эта функция не настроена в публичной сборке исходников.";
 "PremiumFeature.OpenGroup" = "Перейти в группу";
 "Settings.Premium" = "Premium";
-"Premium.APNsHelp" = "Apple Push доставляет уведомления, даже когда Tele6ram приостановлен системой. Это надёжнее и расходует меньше батареи, чем постоянная работа приложения в фоне.";
+"Premium.APNsHelp" = "Apple Push доставляет уведомления, даже когда LegacyGram приостановлен системой. Это надёжнее и расходует меньше батареи, чем постоянная работа приложения в фоне.";
 "Premium.SkeuoHelp" = "Включает классическое оформление в стиле iOS 6. Эта настройка изменяет только внешний вид интерфейса и чатов.";
 "Notifications.MessageNotifications" = "УВЕДОМЛЕНИЯ О СООБЩЕНИЯХ";
 "Notifications.MessageNotificationsAlert" = "Сигнал";
@@ -2867,3 +2867,7 @@ Unused sets are archived when you add more.";
 "Appearance.PreviewOutgoingText" = "Это же очевидно!";
 "Appearance.AccentColor" = "Цвет элементов";
 "Appearance.PickAccentColor" = "Выберите цвет";
+"Settings.Donate" = "Донат";
+"Settings.DonateInfo" = "Поддержите LegacyGram, чтобы помогать развивать и поддерживать приложение. На странице доната можно выбрать любую сумму — поддержка полностью добровольная.";
+"Settings.DonateButton" = "Открыть страницу доната";
+

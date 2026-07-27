@@ -30,5 +30,6 @@ void TGRegisterModernUserId(int32_t uid, int64_t modernUserId);
 @property (nonatomic) int32_t bot_info_version;
 @property (nonatomic, strong) NSString *restriction_reason;
 @property (nonatomic, strong) NSString *inlineBotPlaceholder;
+@property (nonatomic) int64_t emojiStatusDocumentId;
 
 @end

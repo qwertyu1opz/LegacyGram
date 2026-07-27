@@ -16,11 +16,11 @@
 #   import <MTProtoKitMac/MTQueue.h>
 #   import <MTProtoKitMac/MTProtoKitMac.h>
 #else
-#   import <MTProtoKit/MTTransportScheme.h>
-#   import <MTProtoKit/MTTcpTransport.h>
-#   import <MTProtoKit/MTHttpTransport.h>
-#   import <MTProtoKit/MTQueue.h>
-#   import <MTProtoKit/MTProtoKit.h>
+#   import "MTTransportScheme.h"
+#   import "MTTcpTransport.h"
+#   import "MTHttpTransport.h"
+#   import "MTQueue.h"
+#   import "MTProtoKit.h"
 #endif
 
 #import "MTDatacenterAddress.h"
@@ -34,9 +34,9 @@
 #   import <MTProtoKitMac/MTSignal.h>
 #   import <MTProtoKitMac/MTAtomic.h>
 #else
-#   import <MTProtoKit/MTDisposable.h>
-#   import <MTProtoKit/MTSignal.h>
-#   import <MTProtoKit/MTAtomic.h>
+#   import "MTDisposable.h"
+#   import "MTSignal.h"
+#   import "MTAtomic.h"
 #endif
 
 #import <netinet/in.h>

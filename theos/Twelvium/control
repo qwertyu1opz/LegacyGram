@@ -1,0 +1,9 @@
+Package: com.example.twelvium
+Name: Twelve
+Version: 0.91
+Architecture: iphoneos-arm
+Description: Clean Telegram-compatible client for iOS 6
+Maintainer: Local build
+Author: Local build
+Section: Applications
+Depends: firmware (>= 6.0)

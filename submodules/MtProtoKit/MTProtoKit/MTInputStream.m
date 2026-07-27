@@ -5,7 +5,10 @@
 #import "MTInputStream.h"
 
 #if TARGET_OS_IPHONE
-#   import <endian.h>
+#   import <machine/endian.h>
+#   define __BYTE_ORDER __DARWIN_BYTE_ORDER
+#   define __LITTLE_ENDIAN __DARWIN_LITTLE_ENDIAN
+#   define __BIG_ENDIAN __DARWIN_BIG_ENDIAN
 #endif
 
 static inline int roundUpInput(int numToRound, int multiple)
@@ -67,8 +70,8 @@ static inline int roundUpInput(int numToRound, int multiple)
         }
     }
     
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-#elif __BYTE_ORDER == __BIG_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
+#elif BYTE_ORDER == BIG_ENDIAN
 #   error "Big endian is not implemented"
 #else
 #   error "Unknown byte order"
@@ -87,8 +90,8 @@ static inline int roundUpInput(int numToRound, int multiple)
         return 0;
     }
     
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-#elif __BYTE_ORDER == __BIG_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
+#elif BYTE_ORDER == BIG_ENDIAN
 #   error "Big endian is not implemented"
 #else
 #   error "Unknown byte order"
@@ -108,8 +111,8 @@ static inline int roundUpInput(int numToRound, int multiple)
         }
     }
     
-#if __BYTE_ORDER == __LITTLE_ENDIAN
-#elif __BYTE_ORDER == __BIG_ENDIAN
+#if BYTE_ORDER == LITTLE_ENDIAN
+#elif BYTE_ORDER == BIG_ENDIAN
 #   error "Big endian is not implemented"
 #else
 #   error "Unknown byte order"

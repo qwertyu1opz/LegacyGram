@@ -606,10 +606,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		93DBD22F18B2D72800631ADC /* MTRequestErrorContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTRequestErrorContext.h; path = MtProtoKit/MTRequestErrorContext.h; sourceTree = "<group>"; };
-		93DBD23018B2D72800631ADC /* MTRequestErrorContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MTRequestErrorContext.m; path = MtProtoKit/MTRequestErrorContext.m; sourceTree = "<group>"; };
-		93DBD23318B2D9AA00631ADC /* MTTime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MTTime.h; path = MtProtoKit/MTTime.h; sourceTree = "<group>"; };
-		93DBD23418B2DA1E00631ADC /* MTTime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MTTime.m; path = MtProtoKit/MTTime.m; sourceTree = "<group>"; };
+		93DBD22F18B2D72800631ADC /* MTRequestErrorContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MTRequestErrorContext.h; path = MTProtoKit/MTRequestErrorContext.h; sourceTree = "<group>"; };
+		93DBD23018B2D72800631ADC /* MTRequestErrorContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MTRequestErrorContext.m; path = MTProtoKit/MTRequestErrorContext.m; sourceTree = "<group>"; };
+		93DBD23318B2D9AA00631ADC /* MTTime.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MTTime.h; path = MTProtoKit/MTTime.h; sourceTree = "<group>"; };
+		93DBD23418B2DA1E00631ADC /* MTTime.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MTTime.m; path = MTProtoKit/MTTime.m; sourceTree = "<group>"; };
 		D00354651C173BF0006610DA /* MtProtoKitStabilityTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MtProtoKitStabilityTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D00354671C173BF0006610DA /* MtProtoKitStabilityTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MtProtoKitStabilityTests.m; sourceTree = "<group>"; };
 		D00354691C173BF0006610DA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -779,7 +779,7 @@
 		D0CAF2F01D75F4EA0011F558 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		D0CB05F71ADC4483005E298F /* libMtProtoKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libMtProtoKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		D0CB05FA1ADC4483005E298F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D0CB05FB1ADC4483005E298F /* MtProtoKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MtProtoKit.h; sourceTree = "<group>"; };
+		D0CB05FB1ADC4483005E298F /* MTProtoKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTProtoKit.h; sourceTree = "<group>"; };
 		D0CB06071ADC4483005E298F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D0CB06081ADC4483005E298F /* MtProtoKitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MtProtoKitTests.m; sourceTree = "<group>"; };
 		D0CD98E61D75BFAE00F41187 /* SSignalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SSignalKit.framework; path = "../SSignalKit/build/Debug-iphoneos/SSignalKit.framework"; sourceTree = "<group>"; };
@@ -1370,13 +1370,13 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		D0CB05F81ADC4483005E298F /* MtProtoKit */ = {
+		D0CB05F81ADC4483005E298F /* MTProtoKit */ = {
 			isa = PBXGroup;
 			children = (
-				D0CB05FB1ADC4483005E298F /* MtProtoKit.h */,
+				D0CB05FB1ADC4483005E298F /* MTProtoKit.h */,
 				D0CB05F91ADC4483005E298F /* Supporting Files */,
 			);
-			path = MtProtoKit;
+			path = MTProtoKit;
 			sourceTree = "<group>";
 		};
 		D0CB05F91ADC4483005E298F /* Supporting Files */ = {
@@ -2433,6 +2433,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/openssl",
 				);
 				INFOPLIST_FILE = MtProtoKit/Info.plist;
@@ -2707,6 +2708,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/openssl",
 				);
 				INFOPLIST_FILE = MtProtoKit/Info.plist;

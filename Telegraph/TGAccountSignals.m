@@ -242,7 +242,7 @@
     registerDevice.flags = 0;
     registerDevice.token_type = voip ? 9 : 1;
     registerDevice.token = deviceToken;
-#if defined(DEBUG) || defined(TELE6RAM_APNS_SANDBOX)
+#if defined(DEBUG) || defined(LEGACYGRAM_APNS_SANDBOX)
     registerDevice.app_sandbox = true;
 #else
     registerDevice.app_sandbox = false;

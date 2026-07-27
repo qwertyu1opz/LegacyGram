@@ -1,5 +1,5 @@
 #import <Foundation/Foundation.h>
-#import <UIkit/UIKit.h>
+#import <UIKit/UIKit.h>
 
 @interface TGMediaAssetsMomentsSectionHeader : NSObject
 

@@ -107,6 +107,7 @@ typedef enum {
 @property (nonatomic, strong) NSString *about;
 
 @property (nonatomic) bool botInlineGeo;
+@property (nonatomic) int64_t emojiStatusDocumentId;
 
 @property (nonatomic, readonly) bool isBot;
 @property (nonatomic, readonly) bool isDeleted;

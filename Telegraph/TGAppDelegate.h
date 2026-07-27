@@ -35,7 +35,7 @@ extern TGAppDelegate *TGAppDelegateInstance;
 
 extern NSString *TGDeviceProximityStateChangedNotification;
 
-// Tele6ram's local background notification transport is enabled by default and
+// Twelvium's local background notification transport is enabled by default and
 // can be stopped independently from normal foreground networking.
 extern NSString *const TGIOS6BackgroundNotificationsEnabledKey;
 #ifdef __cplusplus
@@ -45,7 +45,7 @@ extern bool TGIOS6BackgroundNotificationsEnabled(void);
 #endif
 
 // Apple Push Notification service delivery is controlled independently from
-// Tele6ram's legacy background MTProto transport.
+// Twelvium's legacy background MTProto transport.
 extern NSString *const TGIOS6APNsNotificationsEnabledKey;
 #ifdef __cplusplus
 extern "C" bool TGIOS6APNsNotificationsEnabled(void);

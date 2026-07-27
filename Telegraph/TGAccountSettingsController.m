@@ -75,6 +75,7 @@
 #import "TGAppearanceController.h"
 #import "TGProxySetupController.h"
 #import "TGPassportRequestController.h"
+#import "../Modules/NekroEngine/FuckDPI/TGFuckDPIController.h"
 
 #import "TGTwoStepConfigSignal.h"
 
@@ -94,6 +95,9 @@
     SMetaDisposable *_proxyStatusDisposable;
     TGCollectionMenuSection *_proxySection;
     TGVariantCollectionItem *_proxyItem;
+
+    TGCollectionMenuSection *_fuckDPISection;
+    TGDisclosureActionCollectionItem *_fuckDPIItem;
     
     TGAccountInfoCollectionItem *_profileDataItem;
     TGButtonCollectionItem *_setProfilePhotoItem;
@@ -111,6 +115,7 @@
     TGDisclosureActionCollectionItem *_clearChatListCacheItem;
     TGDisclosureActionCollectionItem *_supportItem;
     TGDisclosureActionCollectionItem *_faqItem;
+    TGDisclosureActionCollectionItem *_donateItem;
     
     TGCollectionMenuSection *_otherSection;
     TGDisclosureActionCollectionItem *_passportItem;
@@ -158,6 +163,10 @@
         
         _proxyItem = [[TGVariantCollectionItem alloc] initWithTitle:TGLocalized(@"Settings.Proxy") action:@selector(proxyPressed)];
         _proxySection = [[TGCollectionMenuSection alloc] initWithItems:@[_proxyItem]];
+
+        _fuckDPIItem = [[TGDisclosureActionCollectionItem alloc] initWithTitle:@"FuckDPI" action:@selector(fuckDPIPressed)];
+        _fuckDPISection = [[TGCollectionMenuSection alloc] initWithItems:@[_fuckDPIItem]];
+        [self.menuSections addSection:_fuckDPISection];
         
         _wallpapersItem = [[TGDisclosureActionCollectionItem alloc] initWithTitle:TGLocalized(@"Settings.Appearance") action:@selector(wallpapersPressed)];
         _languageItem = [[TGVariantCollectionItem alloc] initWithTitle:TGLocalized(@"Settings.AppLanguage") variant:TGLocalized(@"Localization.LanguageName") action:@selector(languagePressed)];
@@ -246,10 +255,14 @@
         
         _faqItem = [[TGDisclosureActionCollectionItem alloc] initWithTitle:TGLocalized(@"Settings.FAQ") action:@selector(faqPressed)];
         _faqItem.deselectAutomatically = true;
+
+        _donateItem = [[TGDisclosureActionCollectionItem alloc] initWithTitle:TGLocalized(@"Settings.Donate") action:@selector(donatePressed)];
+        _donateItem.deselectAutomatically = true;
         
         TGCollectionMenuSection *infoSection = [[TGCollectionMenuSection alloc] initWithItems:@[
             _supportItem,
-            _faqItem
+            _faqItem,
+            _donateItem
         ]];
         [self.menuSections addSection:infoSection];
    
@@ -294,6 +307,7 @@
     _watchItem.icon = TGImageNamed(@"SettingsWatchIcon.png");
     _supportItem.icon = TGImageNamed(@"SettingsSupportIcon.png");
     _faqItem.icon = TGImageNamed(@"SettingsFaqIcon.png");
+    _donateItem.icon = TGImageNamed(@"SettingsDonateIcon.png");
     if (_callSettingsItem != nil)
         _callSettingsItem.icon = TGImageNamed(@"SettingsCallsIcon.png");
     
@@ -796,6 +810,16 @@
     [TGAppDelegateInstance handleOpenInstantView:TGLocalized(@"Settings.FAQ_URL") disableActions:false];
 }
 
+- (void)donatePressed
+{
+    static NSString *const LegacyGramDonationURL = @"https://example.com/legacygram-donate";
+    [TGCustomAlertView presentAlertWithTitle:TGLocalized(@"Settings.Donate") message:TGLocalized(@"Settings.DonateInfo") cancelButtonTitle:TGLocalized(@"Common.Cancel") okButtonTitle:TGLocalized(@"Settings.DonateButton") completionBlock:^(bool okButtonPressed)
+    {
+        if (okButtonPressed)
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:LegacyGramDonationURL]];
+    }];
+}
+
 #pragma mark -
 
 - (void)updateSubtitleWithPhoneNumber:(NSString *)phoneNumber username:(NSString *)username
@@ -1040,6 +1064,12 @@
 - (void)proxyPressed
 {
     TGProxySetupController *controller = [[TGProxySetupController alloc] init];
+    [self.navigationController pushViewController:controller animated:true];
+}
+
+- (void)fuckDPIPressed
+{
+    TGFuckDPIController *controller = [[TGFuckDPIController alloc] init];
     [self.navigationController pushViewController:controller animated:true];
 }
 
