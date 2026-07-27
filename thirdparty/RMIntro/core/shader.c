@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef LOGGING_ON
+#define LOGGING_ON 0
+#endif
+
 #define TAG "shaders"
 
 static void log_v_fixed_length(const GLchar* source, const GLint length) {
