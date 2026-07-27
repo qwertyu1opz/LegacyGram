@@ -30,6 +30,10 @@ int nw_route_delete_default_scoped(struct in_addr gateway, unsigned ifindex);
 // Returns 0 on success, -1 on failure.
 int nw_route_delete_host(struct in_addr dst, struct in_addr gateway, unsigned ifindex);
 
+// Add/delete an unscoped IPv4 network route through a gateway.
+int nw_route_add_network(struct in_addr dst, struct in_addr mask, struct in_addr gateway, int mtu);
+int nw_route_delete_network(struct in_addr dst, struct in_addr mask, struct in_addr gateway);
+
 // Dump all active IPv4 routes to stdout.
 void nw_route_dump(void);
 

@@ -232,6 +232,14 @@ int nw_route_delete_host(struct in_addr dst, struct in_addr gateway, unsigned if
     return nw_route_send(RTM_DELETE, RTF_HOST | RTF_GATEWAY, dst, mask, gateway, ifindex, 0);
 }
 
+int nw_route_add_network(struct in_addr dst, struct in_addr mask, struct in_addr gateway, int mtu) {
+    return nw_route_send(RTM_ADD, RTF_GATEWAY, dst, mask, gateway, 0, mtu);
+}
+
+int nw_route_delete_network(struct in_addr dst, struct in_addr mask, struct in_addr gateway) {
+    return nw_route_send(RTM_DELETE, RTF_GATEWAY, dst, mask, gateway, 0, 0);
+}
+
 int nw_route_add_default(struct in_addr gateway, int mtu) {
     struct in_addr dst = {0};
     struct in_addr mask = {0};

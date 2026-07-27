@@ -162,10 +162,14 @@ static NSString *TGEnginePath(void)
             [arguments addObject:[NSString stringWithFormat:@"%@=%@", key, value]];
     }
 
-    [arguments addObject:@"routeguard=1"];
+    // FuckDPI is deliberately a Telegram-only split tunnel. It must never
+    // replace iOS's default route, DNS, primary network service, or kernel
+    // scoped-routing policy.
+    [arguments addObject:@"split=telegram"];
+    [arguments addObject:@"routeguard=0"];
     [arguments addObject:@"bindwarp=1"];
-    [arguments addObject:@"kpatch=1"];
-    [arguments addObject:@"surgery=1"];
+    [arguments addObject:@"kpatch=0"];
+    [arguments addObject:@"surgery=0"];
     return arguments;
 }
 

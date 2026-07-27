@@ -1242,6 +1242,25 @@ static int g_runfor = 0;  // runfor=N: auto-stop (cleanup) after N seconds — s
 static int g_bind_warp = 0;  // bindwarp=0 disables IP_BOUND_IF on the WARP socket (A/B)
 static int g_route_guard = 0;  // routeguard=1: poll-repin utun default (loses race vs configd)
 static int g_surgery = 1;  // surgery=0: skip manual default-route swap (test pure set_primary)
+static int g_telegram_split = 0; // route Telegram only; never mutate global network state
+
+struct nw_split_route {
+    const char *network;
+    const char *mask;
+    int installed;
+};
+
+static struct nw_split_route g_telegram_routes[] = {
+    { "91.108.4.0",   "255.255.252.0", 0 },
+    { "91.108.8.0",   "255.255.252.0", 0 },
+    { "91.108.12.0",  "255.255.252.0", 0 },
+    { "91.108.16.0",  "255.255.252.0", 0 },
+    { "91.108.20.0",  "255.255.252.0", 0 },
+    { "91.108.56.0",  "255.255.252.0", 0 },
+    { "91.105.192.0", "255.255.254.0", 0 },
+    { "149.154.160.0", "255.255.240.0", 0 },
+    { NULL, NULL, 0 }
+};
 
 // iOS has no `scutil` (that's a macOS SystemConfiguration tool). The BSD
 // resolver on iOS reads /etc/resolv.conf, so we manage DNS by writing that
@@ -1315,6 +1334,7 @@ static void cleanup(void) {
     printf("\nCleaning up tunnel and routing...\n");
 
     unlink("/tmp/nekrowarp.pid");
+    unlink("/tmp/nekrowarp.telegram_split");
 
     if (dns_changed) {
         printf("Restoring DNS...\n");
@@ -1330,6 +1350,16 @@ static void cleanup(void) {
         printf("Restoring original default route via %s...\n", inet_ntoa(orig_gw));
         nw_route_delete_default(warp_gw);
         nw_route_add_default(orig_gw, 0);
+    }
+
+    for (int i = 0; g_telegram_routes[i].network != NULL; i++) {
+        if (g_telegram_routes[i].installed) {
+            struct in_addr network, mask;
+            inet_aton(g_telegram_routes[i].network, &network);
+            inet_aton(g_telegram_routes[i].mask, &mask);
+            nw_route_delete_network(network, mask, warp_gw);
+            g_telegram_routes[i].installed = 0;
+        }
     }
 
     if (wifi_scoped_default_added) {
@@ -1418,6 +1448,23 @@ static int setup_routing(const char *endpoint_ip, const char *client_ip, int mtu
     uint32_t gateway_h = (client_h & 0xffffff00) | 1;
     warp_gw.s_addr = htonl(gateway_h);
     printf("WARP Gateway: %s\n", inet_ntoa(warp_gw));
+
+    if (g_telegram_split) {
+        printf("[ FuckDPI ] Telegram-only split route; keeping Wi-Fi default route and primary service untouched.\n");
+        for (int i = 0; g_telegram_routes[i].network != NULL; i++) {
+            struct in_addr network, mask;
+            inet_aton(g_telegram_routes[i].network, &network);
+            inet_aton(g_telegram_routes[i].mask, &mask);
+            if (nw_route_add_network(network, mask, warp_gw, mtu) < 0 && errno != EEXIST) {
+                fprintf(stderr, "[ FuckDPI ] failed to add %s route: %s\n",
+                        g_telegram_routes[i].network, strerror(errno));
+                cleanup();
+                return -1;
+            }
+            g_telegram_routes[i].installed = 1;
+        }
+        return 0;
+    }
 
     // If the kernel scoped routing was successfully disabled, we don't need
     // the SCDynamicStore override that drops Wi-Fi. Otherwise, fallback to it.
@@ -2344,9 +2391,11 @@ static int cmd_warp_tunnel(const char *ip, int port, const char *priv_b64, const
         fprintf(stderr, "iOS 7+ (including 9.3.5) support has been dropped for maximum stability on iOS 5.1.1.\n");
         exit(1);
     }
-    printf("[ NekroWARP ] iOS 5.x mode: full route surgery + kpatch enabled.\n");
+    printf(g_telegram_split
+        ? "[ FuckDPI ] iOS 5/6 isolated Telegram split-routing mode.\n"
+        : "[ NekroWARP ] iOS 5.x mode: full route surgery + kpatch enabled.\n");
 
-    if (g_kpatch) {
+    if (g_kpatch && !g_telegram_split) {
         mach_port_t kt = MACH_PORT_NULL;
         kern_return_t kr = task_for_pid(mach_task_self(), 0, &kt);
         if (kr == KERN_SUCCESS && kt != MACH_PORT_NULL) {
@@ -2480,7 +2529,8 @@ static int cmd_warp_tunnel(const char *ip, int port, const char *priv_b64, const
 
     if (orig_gw.s_addr != INADDR_ANY && wifi_ifindex != 0) {
         fprintf(stderr, "[ NekroWARP ] Adding pre-handshake host route to endpoint %s via gateway %s on interface index %u...\n", endpoint_ip_str, inet_ntoa(orig_gw), wifi_ifindex);
-        nw_route_add_host(warp_ep_ip, orig_gw, wifi_ifindex);
+        if (nw_route_add_host(warp_ep_ip, orig_gw, wifi_ifindex) == 0 || errno == EEXIST)
+            host_route_added = 1;
     }
     // Per-attempt timeout + retries. The WARP edge's handshake response often takes
     // 3-8s to arrive; each attempt sends a FRESH initiation (new ephemeral), which
@@ -2611,14 +2661,17 @@ static int cmd_warp_tunnel(const char *ip, int port, const char *priv_b64, const
         }
     }
 
-    // iOS 5/6 only build - no PF proxy. Skip pf.os hack.
-    save_original_dns();
-    FILE *df = fopen("/tmp/nekrowarp.orig_dns", "w");
-    if (df) {
-        fprintf(df, "%s\n", orig_dns);
-        fclose(df);
+    // A Telegram-only tunnel must not alter resolver state for SpringBoard or
+    // any other app. Full-tunnel legacy mode retains the old DNS behaviour.
+    if (!g_telegram_split) {
+        save_original_dns();
+        FILE *df = fopen("/tmp/nekrowarp.orig_dns", "w");
+        if (df) {
+            fprintf(df, "%s\n", orig_dns);
+            fclose(df);
+        }
+        set_dns_warp(dns_ip);
     }
-    set_dns_warp(dns_ip);
 
     if (allowed_ips && strlen(allowed_ips) > 0) {
         printf("AllowedIPs = %s\n", allowed_ips);
@@ -2631,6 +2684,13 @@ static int cmd_warp_tunnel(const char *ip, int port, const char *priv_b64, const
 
     if (setup_routing(endpoint_ip_str, client_ip, mtu) < 0) {
         goto fail;
+    }
+    if (g_telegram_split) {
+        FILE *sf = fopen("/tmp/nekrowarp.telegram_split", "w");
+        if (sf) {
+            fprintf(sf, "1\n");
+            fclose(sf);
+        }
     }
 
     signal(SIGINT, handle_sigint);
@@ -2875,7 +2935,13 @@ static int cmd_netcheck(void) {
     fclose(f);
     if (!alive) return 2;
 
-    int rc = test_http_reachability("yandex.ru", 80);
+    // In FuckDPI mode a generic web probe would bypass WARP through Wi-Fi and
+    // produce a false green state. This Telegram DC address is covered by the
+    // split routes, so a successful TCP connection also proves the tunnel path.
+    int split = (access("/tmp/nekrowarp.telegram_split", F_OK) == 0);
+    int rc = split
+        ? test_direct_connection("149.154.167.51", 443)
+        : test_http_reachability("yandex.ru", 80);
     return (rc == 0) ? 0 : 1;
 }
 
@@ -3190,6 +3256,7 @@ int main(int argc, char **argv) {
             else if (strcasecmp(key, "routeguard") == 0)  g_route_guard = atoi(val);
             else if (strcasecmp(key, "surgery") == 0)     g_surgery = atoi(val);
             else if (strcasecmp(key, "kpatch") == 0)      g_kpatch = atoi(val);
+            else if (strcasecmp(key, "split") == 0)       g_telegram_split = (strcasecmp(val, "telegram") == 0);
             else                                          nw_awg_set(&awg, key, val);
         }
         return cmd_warp_tunnel(argv[2], atoi(argv[3]), argv[4], argv[5], argv[6],
