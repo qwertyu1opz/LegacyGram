@@ -101,6 +101,33 @@
 #import "TGProxySignals.h"
 
 #import "TGPresentation.h"
+#import "TGDocumentMediaAttachment+Telegraph.h"
+#import "../../legacy/TL/TLMetaRpc.h"
+#import "../../legacy/TL/NSOutputStream+TL.h"
+
+static const int32_t TGIOS6VectorConstructor = (int32_t)0x1cb5c415;
+
+@interface TGIOS6GetCustomEmojiDocumentsRequest : TLMetaRpc
+@property (nonatomic, strong) NSArray *documentIds;
+@end
+
+@implementation TGIOS6GetCustomEmojiDocumentsRequest
+- (Class)responseClass { return [NSArray class]; }
+- (int)impliedResponseSignature { return TGIOS6VectorConstructor; }
+- (int)layerVersion { return 144; }
+- (int32_t)TLconstructorSignature { return (int32_t)0xd9ab0f54; }
+- (int32_t)TLconstructorName { return -1; }
+- (id<TLObject>)TLbuildFromMetaObject:(std::shared_ptr<TLMetaObject>)__unused metaObject { return nil; }
+- (void)TLfillFieldsWithValues:(std::map<int32_t, TLConstructedValue> *)__unused values {}
+- (void)TLserialize:(NSOutputStream *)os
+{
+    [os writeInt32:TGIOS6VectorConstructor];
+    [os writeInt32:(int32_t)_documentIds.count];
+    for (NSNumber *documentId in _documentIds)
+        [os writeInt64:documentId.longLongValue];
+}
+- (id<TLObject>)TLdeserialize:(NSInputStream *)__unused is signature:(int32_t)__unused signature environment:(id<TLSerializationEnvironment>)__unused environment context:(TLSerializationContext *)__unused context error:(__autoreleasing NSError **)__unused error { return nil; }
+@end
 
 static UIColor *TGDialogListNavigationTitleColor(TGPresentation *presentation)
 {
@@ -223,6 +250,8 @@ static UIImage *TGIOS6CenteredScaledBarIcon(UIImage *image, CGFloat scale)
 @property (nonatomic, strong) UILabel *titleStatusSubtitleLabel;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) TGLockIconView *titleLockIconView;
+@property (nonatomic, strong) TGRemoteImageView *titleEmojiStatusView;
+@property (nonatomic) int64_t titleEmojiStatusDocumentId;
 
 @property (nonatomic, strong) UIActivityIndicatorView *titleStatusIndicator;
 
@@ -862,6 +891,8 @@ NSString *authorNameYou = @"  __TGLocalized__YOU";
         titleLabelFrame.origin.x -= 4.0f;
     _titleLockIconView.frame = CGRectMake(CGRectGetMaxX(titleLabelFrame) + 6.0f, titleLabelFrame.origin.y + 4.0f, _titleLockIconView.frame.size.width, _titleLockIconView.frame.size.height);
     _titleLabel.frame = titleLabelFrame;
+    if (!_titleEmojiStatusView.hidden)
+        _titleEmojiStatusView.frame = CGRectMake(CGRectGetMaxX(titleLabelFrame) + 4.0f, floorf((self->_titleContainer.frame.size.height - 18.0f) / 2.0f), 18.0f, 18.0f);
     
     if (_titleStatusLabel != nil)
     {
@@ -913,6 +944,12 @@ NSString *authorNameYou = @"  __TGLocalized__YOU";
     _titleLabel.text = TGLocalized(@"DialogList.Title");
     [_titleLabel sizeToFit];
     [_titleContainer addSubview:_titleLabel];
+
+    _titleEmojiStatusView = [[TGRemoteImageView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 18.0f, 18.0f)];
+    _titleEmojiStatusView.contentMode = UIViewContentModeScaleAspectFit;
+    _titleEmojiStatusView.hidden = true;
+    [_titleContainer addSubview:_titleEmojiStatusView];
+    [self updateTitleEmojiStatus];
     
     _titleLockIconView = [[TGLockIconView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 2.0f, 2.0f)];
     _titleLockIconView.presentation = self.presentation;
@@ -1046,9 +1083,58 @@ NSString *authorNameYou = @"  __TGLocalized__YOU";
         _tableView.contentOffset = CGPointMake(0.0f, -_tableView.contentInset.top + [TGSearchBar searchBarBaseHeight] + self.explicitTableInset.top);
 }
 
+- (void)updateTitleEmojiStatus
+{
+    TGUser *user = [TGDatabaseInstance() loadUser:TGTelegraphInstance.clientUserId];
+    int64_t documentId = user.emojiStatusDocumentId;
+    if (documentId == 0)
+    {
+        _titleEmojiStatusDocumentId = 0;
+        _titleEmojiStatusView.hidden = true;
+        [_titleEmojiStatusView cancelLoading];
+        [self _layoutTitleViews:self.interfaceOrientation];
+        return;
+    }
+    if (_titleEmojiStatusDocumentId == documentId && !_titleEmojiStatusView.hidden)
+        return;
+
+    _titleEmojiStatusDocumentId = documentId;
+    _titleEmojiStatusView.hidden = true;
+    TGIOS6GetCustomEmojiDocumentsRequest *request = [[TGIOS6GetCustomEmojiDocumentsRequest alloc] init];
+    request.documentIds = @[ @(documentId) ];
+    __weak TGDialogListController *weakSelf = self;
+    [[TGTelegramNetworking instance] performRpc:request completionBlock:^(id result, __unused int64_t responseTime, MTRpcError *error)
+    {
+        if (error != nil || ![result isKindOfClass:[NSArray class]])
+            return;
+        for (id documentDesc in (NSArray *)result)
+        {
+            if (![documentDesc isKindOfClass:[TLDocument class]])
+                continue;
+            TGDocumentMediaAttachment *document = [[TGDocumentMediaAttachment alloc] initWithTelegraphDocumentDesc:documentDesc];
+            if (document.documentId != documentId)
+                continue;
+            NSString *thumbnailUri = [document.thumbnailInfo imageUrlForLargestSize:NULL];
+            if (thumbnailUri.length == 0)
+                return;
+            dispatch_async(dispatch_get_main_queue(), ^
+            {
+                TGDialogListController *strongSelf = weakSelf;
+                if (strongSelf == nil || strongSelf->_titleEmojiStatusDocumentId != documentId)
+                    return;
+                [strongSelf->_titleEmojiStatusView loadImage:thumbnailUri filter:nil placeholder:nil];
+                strongSelf->_titleEmojiStatusView.hidden = false;
+                [strongSelf _layoutTitleViews:strongSelf.interfaceOrientation];
+            });
+            return;
+        }
+    } progressBlock:nil requiresCompletion:true requestClass:TGRequestClassGeneric];
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [self updateTitleEmojiStatus];
     
     [self updateProxyButton];
     

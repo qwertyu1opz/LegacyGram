@@ -22,6 +22,33 @@ static const TGTwoColors colors[] = {
     { .top = 0xd669ed, .bottom = 0xe0a2f3 }, //pink
 };
 
+static bool TGClassicIOS6StyleEnabled(void)
+{
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"TGClassicIOS6Style"];
+}
+
+static UIImage *TGClassicIOS6AvatarPlaceholder(NSString *type, CGSize size)
+{
+    if (!TGClassicIOS6StyleEnabled())
+        return nil;
+
+    bool group = [type isEqualToString:@"group-avatar"];
+    NSString *name = group ? (size.width <= 40.0f ? @"DialogListGroupAvatarPlaceholderSmall" : @"DialogListGroupAvatarPlaceholder") : (size.width <= 40.0f ? @"DialogListAvatarPlaceholderSmall" : @"DialogListAvatarPlaceholder");
+    NSString *resourceName = [UIScreen mainScreen].scale > 1.5f ? [name stringByAppendingFormat:@"%c2x", 64] : name;
+    NSString *path = [[NSBundle mainBundle] pathForResource:resourceName ofType:@"png" inDirectory:@"ClassicIOS6"];
+    UIImage *source = path.length == 0 ? nil : [UIImage imageWithContentsOfFile:path];
+    if (source == nil)
+        return nil;
+    if ([UIScreen mainScreen].scale > 1.5f && source.CGImage != NULL)
+        source = [UIImage imageWithCGImage:source.CGImage scale:2.0f orientation:UIImageOrientationUp];
+
+    UIGraphicsBeginImageContextWithOptions(size, false, 0.0f);
+    [source drawInRect:CGRectMake(0.0f, 0.0f, size.width, size.height)];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
 @implementation TGPlaceholderImageDataSource
 
 + (void)load
@@ -75,14 +102,14 @@ static const TGTwoColors colors[] = {
         int uid = [args[@"uid"] intValue];
         int colorIndex = [[TGInterfaceAssets instance] userColorIndex:uid];
         
-        return [[NSString alloc] initWithFormat:@"%@:%d:%@x%@", args[@"type"], uid == 0 ? -1 : colorIndex, args[@"w"], args[@"h"]];
+        return [[NSString alloc] initWithFormat:@"%@:%d:%@x%@:%d", args[@"type"], uid == 0 ? -1 : colorIndex, args[@"w"], args[@"h"], TGClassicIOS6StyleEnabled() ? 1 : 0];
     }
     else
     {
         int64_t gid = [args[@"cid"] longLongValue];
         int colorIndex = [[TGInterfaceAssets instance] groupColorIndex:gid];
         
-        return [[NSString alloc] initWithFormat:@"%@:%d:%@x%@", args[@"type"], gid == 0 ? -1 : colorIndex, args[@"w"], args[@"h"]];
+        return [[NSString alloc] initWithFormat:@"%@:%d:%@x%@:%d", args[@"type"], gid == 0 ? -1 : colorIndex, args[@"w"], args[@"h"], TGClassicIOS6StyleEnabled() ? 1 : 0];
     }
 }
 
@@ -133,6 +160,14 @@ static const TGTwoColors colors[] = {
         return nil;
     
     NSString *type = args[@"type"];
+    UIImage *classicPlaceholder = TGClassicIOS6AvatarPlaceholder(type, size);
+    if (classicPlaceholder != nil)
+    {
+        TG_SYNCHRONIZED_BEGIN(imageCache);
+        [TGPlaceholderImageDataSource imageCache][[self cacheKeyForArgs:args]] = classicPlaceholder;
+        TG_SYNCHRONIZED_END(imageCache);
+        return [[TGDataResource alloc] initWithImage:classicPlaceholder decoded:true];
+    }
     if ([type isEqualToString:@"user-avatar"])
     {
         int32_t uid = [args[@"uid"] intValue];

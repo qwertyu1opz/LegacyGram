@@ -18,7 +18,7 @@
 #import "../submodules/MtProtoKit/MTProtoKit/MTContext.h"
 #import "../submodules/MtProtoKit/MTProtoKit/MTProto.h"
 #import "../submodules/MtProtoKit/MTProtoKit/MTRequestMessageService.h"
-#import "../submodules/MtProtoKit/MTProtoKit/MtProtoKit.h"
+#import "../submodules/MtProtoKit/MTProtoKit/MTProtoKit.h"
 
 #import "TGTelegramNetworking.h"
 

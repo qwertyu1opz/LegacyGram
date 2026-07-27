@@ -1,4 +1,4 @@
-# Tele6ram
+# Twelvium
 
 This public source snapshot contains no signing identities, provisioning profiles,
 private API credentials, private user allowlists, or private telemetry endpoints.
@@ -12,9 +12,8 @@ private API credentials, private user allowlists, or private telemetry endpoints
     ```
    Do not commit this file; it is excluded by `.gitignore`.
    A safe starting template is included as `config.h.example`.
-3. Third-party dependencies are vendored in this repository; no submodule
-   initialization is required.
-4. Replace the neutral `com.example.Tele6ram` bundle identifiers and configure your own Apple signing team, entitlements, merchant ID, provisioning profile and APNs credentials.
+3. Initialize any required submodules if you publish this snapshot as a Git repository.
+4. Replace the neutral `com.example.Twelvium` bundle identifiers and configure your own Apple signing team, entitlements, merchant ID, provisioning profile and APNs credentials.
 5. Configure a Dropbox app key only if you need the Dropbox picker integration.
 6. Rebuild the omitted Opus, OpenSSL, libbpg and HockeySDK binaries from source (or supply clean equivalents).
 7. Open `Telegram.xcworkspace` in Xcode.

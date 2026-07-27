@@ -112,59 +112,40 @@ static SPipe *autoNightPreferencesPipe;
 static id<SDisposable> autoNightDisposable;
 static NSString *const TGClassicIOS6StyleDefaultsKey = @"TGClassicIOS6Style";
 
+static UIImage *TGClassicIOS6NavigationResourceImage(NSString *name)
+{
+    CGFloat scale = [UIScreen mainScreen].scale;
+    NSString *resourceName = scale > 1.5f ? [name stringByAppendingString:@"@2x"] : name;
+    NSString *path = [[NSBundle mainBundle] pathForResource:resourceName ofType:@"png" inDirectory:@"ClassicIOS6"];
+    UIImage *image = path.length == 0 ? nil : [UIImage imageWithContentsOfFile:path];
+    if (image != nil && scale > 1.5f && image.CGImage != NULL)
+        image = [UIImage imageWithCGImage:image.CGImage scale:2.0f orientation:UIImageOrientationUp];
+    return image;
+}
+
 static UIImage *TGClassicIOS6NavigationButtonImage(bool backButton, bool highlighted)
 {
-    CGSize size = CGSizeMake(backButton ? 44.0f : 32.0f, 30.0f);
-    UIGraphicsBeginImageContextWithOptions(size, false, 0.0f);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-
-    UIBezierPath *path = nil;
     if (backButton)
     {
-        path = [UIBezierPath bezierPath];
-        [path moveToPoint:CGPointMake(12.5f, 0.75f)];
-        [path addLineToPoint:CGPointMake(40.0f, 0.75f)];
-        [path addQuadCurveToPoint:CGPointMake(43.0f, 3.75f) controlPoint:CGPointMake(43.0f, 0.75f)];
-        [path addLineToPoint:CGPointMake(43.0f, 26.25f)];
-        [path addQuadCurveToPoint:CGPointMake(40.0f, 29.25f) controlPoint:CGPointMake(43.0f, 29.25f)];
-        [path addLineToPoint:CGPointMake(12.5f, 29.25f)];
-        [path addLineToPoint:CGPointMake(1.0f, 15.0f)];
-        [path closePath];
-    }
-    else
-    {
-        path = [UIBezierPath bezierPathWithRoundedRect:CGRectMake(0.75f, 0.75f, size.width - 1.5f, size.height - 1.5f) cornerRadius:5.5f];
+        UIImage *image = TGClassicIOS6NavigationResourceImage(highlighted ? @"BackButton_Pressed" : @"BackButton");
+        return image == nil ? nil : [image stretchableImageWithLeftCapWidth:20 topCapHeight:14];
     }
 
-    CGContextSaveGState(context);
-    CGContextAddPath(context, path.CGPath);
-    CGContextClip(context);
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGFloat components[] =
-    {
-        0.57f, 0.70f, 0.82f, 1.0f,
-        0.25f, 0.43f, 0.62f, 1.0f
-    };
-    if (highlighted)
-    {
-        components[0] = 0.35f; components[1] = 0.50f; components[2] = 0.66f;
-        components[4] = 0.14f; components[5] = 0.29f; components[6] = 0.45f;
-    }
-    CGFloat locations[] = {0.0f, 1.0f};
-    CGGradientRef gradient = CGGradientCreateWithColorComponents(colorSpace, components, locations, 2);
-    CGContextDrawLinearGradient(context, gradient, CGPointMake(0.0f, 0.0f), CGPointMake(0.0f, size.height), 0);
-    CGGradientRelease(gradient);
-    CGColorSpaceRelease(colorSpace);
-    CGContextRestoreGState(context);
+    NSString *suffix = highlighted ? @"_Highlighted" : @"";
+    UIImage *left = TGClassicIOS6NavigationResourceImage([@"MenuButtonLeft" stringByAppendingString:suffix]);
+    UIImage *center = TGClassicIOS6NavigationResourceImage([@"MenuButtonCenter" stringByAppendingString:suffix]);
+    UIImage *right = TGClassicIOS6NavigationResourceImage([@"MenuButtonRight" stringByAppendingString:suffix]);
+    if (left == nil || center == nil || right == nil)
+        return nil;
 
-    CGContextSetLineWidth(context, 1.0f);
-    CGContextSetStrokeColorWithColor(context, UIColorRGB(0x294768).CGColor);
-    CGContextAddPath(context, path.CGPath);
-    CGContextStrokePath(context);
-
+    CGSize size = CGSizeMake(32.0f, left.size.height);
+    UIGraphicsBeginImageContextWithOptions(size, false, 0.0f);
+    [left drawAtPoint:CGPointZero];
+    [center drawInRect:CGRectMake(left.size.width, 0.0f, size.width - left.size.width - right.size.width, size.height)];
+    [right drawAtPoint:CGPointMake(size.width - right.size.width, 0.0f)];
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
-    return [image stretchableImageWithLeftCapWidth:backButton ? 20 : 15 topCapHeight:14];
+    return [image stretchableImageWithLeftCapWidth:(int)left.size.width topCapHeight:20];
 }
 
 - (instancetype)initWithPallete:(TGPresentationPallete *)pallete

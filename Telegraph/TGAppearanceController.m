@@ -38,6 +38,7 @@
     TGCheckCollectionItem *_nightBlueItem;
     
     TGDisclosureActionCollectionItem *_autoNightItem;
+    TGSwitchCollectionItem *_classicIOS6StyleItem;
 }
 
 @property (nonatomic, strong) ASHandle *actionHandle;
@@ -116,6 +117,15 @@
         [self.menuSections addSection:_previewSection];
         
         [self updateColorItem:TGPresentation.currentSavedPallete];
+        
+        _classicIOS6StyleItem = [[TGSwitchCollectionItem alloc] initWithTitle:TGLocalized(@"Appearance.ClassicIOS6Style") isOn:[TGPresentation classicIOS6Style]];
+        _classicIOS6StyleItem.interfaceHandle = _actionHandle;
+        TGCollectionMenuSection *interfaceStyleSection = [[TGCollectionMenuSection alloc] initWithItems:@
+        [
+         [[TGHeaderCollectionItem alloc] initWithTitle:TGLocalized(@"Appearance.InterfaceStyle")],
+         _classicIOS6StyleItem
+        ]];
+        [self.menuSections addSection:interfaceStyleSection];
         
         TGCollectionMenuSection *themeSection = [[TGCollectionMenuSection alloc] initWithItems:@
         [
@@ -330,6 +340,17 @@
     {
         [snapshotView removeFromSuperview];
     }];
+}
+
+- (void)actionStageActionRequested:(NSString *)action options:(id)options
+{
+    if ([action isEqualToString:@"switchItemChanged"] && options[@"item"] == _classicIOS6StyleItem)
+    {
+        [TGPresentation setClassicIOS6Style:_classicIOS6StyleItem.isOn];
+        [_previewItem refreshMetrics];
+        [self.collectionView reloadData];
+        [self setNeedsStatusBarAppearanceUpdate];
+    }
 }
 
 - (void)updateSelection

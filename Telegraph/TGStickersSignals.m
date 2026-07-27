@@ -36,7 +36,7 @@ static NSDictionary *cachedPacks = nil;
 static OSSpinLock cachedPacksLock = 0;
 static NSMutableDictionary *cachedStickerPackInfo = nil;
 static OSSpinLock cachedStickerPackInfoLock = 0;
-static const NSUInteger TGIOS6StickerPackInfoRefreshLimit = 4;
+static const NSUInteger TGIOS6StickerPackInfoRefreshLimit = 8;
 
 static bool TGIOS6StickerSetIsUnsupported(TLStickerSet *stickerSet)
 {
@@ -849,7 +849,7 @@ static NSDictionary *TGIOS6SafeStickerPacks(id dict)
                     }
                 }
                 
-                if (!TGIOS6StickerSetIsUnsupported(resultPack) && (currentPack == nil || currentPack.packHash != resultPack.n_hash || currentPack.installedDate == 0))
+                if (currentPack == nil || currentPack.packHash != resultPack.n_hash || currentPack.installedDate == 0)
                 {
                     SSignal *packInfoSignal = [[self stickerPackInfo:resultPackReference packHash:resultPack.n_hash] catch:^SSignal *(__unused id error)
                     {

@@ -3,7 +3,10 @@
 #import "MTOutputStream.h"
 
 #if TARGET_OS_IPHONE
-#   import <endian.h>
+#   import <machine/endian.h>
+#   define __BYTE_ORDER __DARWIN_BYTE_ORDER
+#   define __LITTLE_ENDIAN __DARWIN_LITTLE_ENDIAN
+#   define __BIG_ENDIAN __DARWIN_BIG_ENDIAN
 #endif
 
 static inline int roundUp(int numToRound, int multiple)

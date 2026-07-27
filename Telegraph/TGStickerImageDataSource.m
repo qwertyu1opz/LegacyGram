@@ -55,13 +55,14 @@ static NSMutableArray *TGStickerPendingLoadTasks()
 }
 
 static NSUInteger TGStickerActiveLoadTaskCount = 0;
+static const NSUInteger TGStickerMaximumConcurrentLoadTaskCount = 3;
 
 static void TGStickerScheduleLoadTask(void (^task)(void))
 {
     void (^taskCopy)(void) = [task copy];
     [taskManagementQueue() dispatchOnQueue:^
     {
-        if (TGStickerActiveLoadTaskCount < 1)
+        if (TGStickerActiveLoadTaskCount < TGStickerMaximumConcurrentLoadTaskCount)
         {
             TGStickerActiveLoadTaskCount++;
             taskCopy();
@@ -81,7 +82,7 @@ static void TGStickerCompleteLoadTask()
             TGStickerActiveLoadTaskCount--;
         
         NSMutableArray *pendingTasks = TGStickerPendingLoadTasks();
-        if (pendingTasks.count != 0 && TGStickerActiveLoadTaskCount < 1)
+        if (pendingTasks.count != 0 && TGStickerActiveLoadTaskCount < TGStickerMaximumConcurrentLoadTaskCount)
         {
             void (^nextTask)(void) = [pendingTasks[0] copy];
             [pendingTasks removeObjectAtIndex:0];

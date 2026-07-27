@@ -13,7 +13,7 @@
 
 #import "TGNetworkWorker.h"
 
-#import "../submodules/MtProtoKit/MTProtoKit/MtProtoKit.h"
+#import "../submodules/MtProtoKit/MTProtoKit/MTProtoKit.h"
 
 #import "TGDownloadMessagesSignal.h"
 

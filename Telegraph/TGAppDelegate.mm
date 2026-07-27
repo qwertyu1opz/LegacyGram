@@ -271,6 +271,74 @@ static bool TGIOS6ShouldExitForRemoteMinimumVersion()
 
 #import <objc/runtime.h>
 
+static bool TGClassicIOS6NativeNavigationImageName(NSString *name)
+{
+    NSString *stem = [[name lastPathComponent] stringByDeletingPathExtension];
+    return [stem hasPrefix:@"BackButton"] || [stem hasPrefix:@"HeaderButton"] || [stem hasPrefix:@"MenuButton"] || [stem hasPrefix:@"ActionMenuButton"];
+}
+
+static UIImage *TGClassicIOS6OriginalImageNamed(NSString *name)
+{
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"TGClassicIOS6Style"] || name.length == 0 || TGClassicIOS6NativeNavigationImageName(name))
+        return nil;
+
+    static NSMutableDictionary *imageCache = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^
+    {
+        imageCache = [[NSMutableDictionary alloc] init];
+    });
+
+    NSString *component = [name lastPathComponent];
+    NSString *extension = component.pathExtension.length == 0 ? @"png" : component.pathExtension;
+    NSString *stem = [component stringByDeletingPathExtension];
+    bool hasExplicitScale = [stem rangeOfString:@"@2x"].location != NSNotFound || [stem rangeOfString:@"@3x"].location != NSNotFound;
+    NSString *resourceName = hasExplicitScale ? stem : ([UIScreen mainScreen].scale > 1.5f ? [stem stringByAppendingFormat:@"%c2x", 64] : stem);
+    NSString *path = [[NSBundle mainBundle] pathForResource:resourceName ofType:extension inDirectory:@"ClassicIOS6"];
+    if (path.length == 0 && !hasExplicitScale)
+    {
+        resourceName = [stem stringByAppendingFormat:@"%c2x", 64];
+        path = [[NSBundle mainBundle] pathForResource:resourceName ofType:extension inDirectory:@"ClassicIOS6"];
+    }
+    if (path.length == 0)
+        return nil;
+
+    UIImage *image = imageCache[path];
+    if (image == nil)
+    {
+        image = [UIImage imageWithContentsOfFile:path];
+        if (image != nil && [resourceName rangeOfString:@"@2x"].location != NSNotFound && image.CGImage != NULL)
+            image = [UIImage imageWithCGImage:image.CGImage scale:2.0f orientation:UIImageOrientationUp];
+        if (image != nil)
+            imageCache[path] = image;
+    }
+    return image;
+}
+
+@interface UIImage (TwelviumClassicIOS6Resources)
+
+@end
+@implementation UIImage (TwelviumClassicIOS6Resources)
+
++ (void)load
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^
+    {
+        Method original = class_getClassMethod(self, @selector(imageNamed:));
+        Method replacement = class_getClassMethod(self, @selector(twelvium_classicIOS6ImageNamed:));
+        method_exchangeImplementations(original, replacement);
+    });
+}
+
++ (UIImage *)twelvium_classicIOS6ImageNamed:(NSString *)name
+{
+    UIImage *classicImage = TGClassicIOS6OriginalImageNamed(name);
+    return classicImage != nil ? classicImage : [self twelvium_classicIOS6ImageNamed:name];
+}
+
+@end
+
 #import <AVFoundation/AVFoundation.h>
 
 #include <inttypes.h>

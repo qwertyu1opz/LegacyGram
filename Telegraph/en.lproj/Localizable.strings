@@ -517,14 +517,14 @@
 "Notifications.Title" = "Notifications";
 "Notifications.BackgroundNotificationsHeader" = "BACKGROUND DELIVERY";
 "Notifications.BackgroundNotifications" = "Background Notifications";
-"Notifications.BackgroundNotificationsHelp" = "When off, Tele6ram stops its background connection and does not show notifications while the app is closed.";
+"Notifications.BackgroundNotificationsHelp" = "When off, LegacyGram stops its background connection and does not show notifications while the app is closed.";
 "Notifications.ApplePushNotifications" = "Apple Push (APNs)";
-"Notifications.ApplePushNotificationsHelp" = "Reliable Apple push delivery while Tele6ram is asleep. Available to Premium users.";
+"Notifications.ApplePushNotificationsHelp" = "Reliable Apple push delivery while LegacyGram is asleep. Available to Premium users.";
 "PremiumFeature.Title" = "Premium feature";
 "PremiumFeature.GroupHelp" = "This feature is not configured in the public source build.";
 "PremiumFeature.OpenGroup" = "Open group";
 "Settings.Premium" = "Premium";
-"Premium.APNsHelp" = "Apple Push delivers notifications even when Tele6ram is suspended. It is reliable and uses less battery than keeping the app active in the background.";
+"Premium.APNsHelp" = "Apple Push delivers notifications even when LegacyGram is suspended. It is reliable and uses less battery than keeping the app active in the background.";
 "Premium.SkeuoHelp" = "Enables the classic iOS 6 visual style. This setting only changes the appearance of the interface and chats.";
 "Notifications.MessageNotifications" = "MESSAGE NOTIFICATIONS";
 "Notifications.MessageNotificationsAlert" = "Alert";
@@ -3396,3 +3396,7 @@ Unused sets are archived when you add more.";
 "Passport.Language.uk" = "Ukrainian";
 "Passport.Language.uz" = "Uzbek";
 "Passport.Language.vi" = "Vietnamese";
+"Settings.Donate" = "Donate";
+"Settings.DonateInfo" = "Support LegacyGram to help maintain and improve the app. Choose any amount on the donation page; every contribution is optional and appreciated.";
+"Settings.DonateButton" = "Open donation page";
+

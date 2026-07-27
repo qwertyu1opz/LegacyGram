@@ -623,7 +623,7 @@
 "Notifications.Title" = "알림";
 "Notifications.BackgroundNotificationsHeader" = "백그라운드 알림";
 "Notifications.BackgroundNotifications" = "백그라운드 알림";
-"Notifications.BackgroundNotificationsHelp" = "끄면 Tele6ram이 백그라운드 연결을 종료하고 앱 밖에서 알림을 표시하지 않습니다.";
+"Notifications.BackgroundNotificationsHelp" = "끄면 LegacyGram이 백그라운드 연결을 종료하고 앱 밖에서 알림을 표시하지 않습니다.";
 "Notifications.MessageNotifications" = "메시지 알림";
 "Notifications.MessageNotificationsAlert" = "알림창";
 "Notifications.MessageNotificationsPreview" = "메시지 미리보기";
@@ -2508,3 +2508,7 @@
 "Privacy.PaymentsClearInfoHelp" = "You can delete your shipping info and instruct all payment providers to remove your saved credit cards. Note that Telegram never stores your credit card data.";
 "Privacy.PaymentsClear.PaymentInfo" = "Payment Info";
 "Privacy.PaymentsClear.ShippingInfo" = "Shipping Info";
+"Settings.Donate" = "Donate";
+"Settings.DonateInfo" = "Support LegacyGram to help maintain and improve the app. Choose any amount on the donation page; every contribution is optional and appreciated.";
+"Settings.DonateButton" = "Open donation page";
+

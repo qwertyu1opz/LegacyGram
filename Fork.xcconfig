@@ -1,4 +1,4 @@
-TELEGRAM_APP_NAME=Telega
+TELEGRAM_APP_NAME = LegacyGram
 TELEGRAPH_BUNDLE_ID=com.example.LegacyGram
 
 #include "Common.xcconfig"

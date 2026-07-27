@@ -43,8 +43,6 @@ Config/PrivateConfig.*
 
 # Local backups and editor files
 .DS_Store
-._*
-__MACOSX/
 CodexBackups/
 IconBackup-*/
 *.bak
@@ -54,7 +52,3 @@ IconBackup-*/
 *.fat-backup
 *.orig
 *~
-
-# Local build helper output
-.bin/
-.theos/

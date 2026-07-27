@@ -623,7 +623,7 @@
 "Notifications.Title" = "Notifiche";
 "Notifications.BackgroundNotificationsHeader" = "CONSEGNA IN BACKGROUND";
 "Notifications.BackgroundNotifications" = "Notifiche in background";
-"Notifications.BackgroundNotificationsHelp" = "Se disattivate, Tele6ram chiude la connessione in background e non mostra notifiche fuori dall’app.";
+"Notifications.BackgroundNotificationsHelp" = "Se disattivate, LegacyGram chiude la connessione in background e non mostra notifiche fuori dall’app.";
 "Notifications.MessageNotifications" = "NOTIFICHE MESSAGGI";
 "Notifications.MessageNotificationsAlert" = "Avviso";
 "Notifications.MessageNotificationsPreview" = "Anteprima messaggio";
@@ -2508,3 +2508,7 @@
 "Privacy.PaymentsClearInfoHelp" = "Puoi cancellare le tue info di spedizione e ordinare ai fornitori dei pagamenti di rimuovere le tue carte di credito salvate. Ricorda che Telegram non archivia mai i dati della tua carta di credito.";
 "Privacy.PaymentsClear.PaymentInfo" = "Info di pagamento";
 "Privacy.PaymentsClear.ShippingInfo" = "Info di spedizione";
+"Settings.Donate" = "Donate";
+"Settings.DonateInfo" = "Support LegacyGram to help maintain and improve the app. Choose any amount on the donation page; every contribution is optional and appreciated.";
+"Settings.DonateButton" = "Open donation page";
+
