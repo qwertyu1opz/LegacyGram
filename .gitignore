@@ -21,7 +21,6 @@ xcuserdata/
 *.xcuserstate
 
 # Local secrets, signing assets and private configuration
-config.h
 *.mobileprovision
 *.provisionprofile
 *.p12
