@@ -674,7 +674,7 @@ NSString *authorNameYou = @"  __TGLocalized__YOU";
 - (UIBarButtonItem *)ios6ArchiveBarButtonItem
 {
     if ([TGPresentation classicIOS6Style])
-        return [[UIBarButtonItem alloc] initWithTitle:(_ios6ArchiveExpanded ? @"Chats" : @"Archive") style:UIBarButtonItemStyleBordered target:self action:@selector(archiveButtonPressed:)];
+        return [[UIBarButtonItem alloc] initWithTitle:(_ios6ArchiveExpanded ? TGLocalized(@"Legacy.ChatsButton") : TGLocalized(@"Legacy.ArchiveButton")) style:UIBarButtonItemStyleBordered target:self action:@selector(archiveButtonPressed:)];
 
     if (iosMajorVersion() >= 7)
     {
@@ -682,14 +682,14 @@ NSString *authorNameYou = @"  __TGLocalized__YOU";
         button.frame = CGRectMake(0.0f, 0.0f, 70.0f, 44.0f);
         button.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
         button.titleLabel.font = TGSystemFontOfSize(17.0f);
-        [button setTitle:(_ios6ArchiveExpanded ? @"Chats" : @"Archive") forState:UIControlStateNormal];
+        [button setTitle:(_ios6ArchiveExpanded ? TGLocalized(@"Legacy.ChatsButton") : TGLocalized(@"Legacy.ArchiveButton")) forState:UIControlStateNormal];
         [button setTitleColor:self.presentation.pallete.navigationButtonColor forState:UIControlStateNormal];
         [button setTitleColor:[self.presentation.pallete.navigationButtonColor colorWithAlphaComponent:0.4f] forState:UIControlStateHighlighted];
         [button addTarget:self action:@selector(archiveButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
         return [[UIBarButtonItem alloc] initWithCustomView:button];
     }
 
-    return [[UIBarButtonItem alloc] initWithTitle:(_ios6ArchiveExpanded ? @"Chats" : @"Archive") style:UIBarButtonItemStylePlain target:self action:@selector(archiveButtonPressed:)];
+    return [[UIBarButtonItem alloc] initWithTitle:(_ios6ArchiveExpanded ? TGLocalized(@"Legacy.ChatsButton") : TGLocalized(@"Legacy.ArchiveButton")) style:UIBarButtonItemStylePlain target:self action:@selector(archiveButtonPressed:)];
 }
 
 - (UIBarButtonItem *)controllerLeftBarButtonItem

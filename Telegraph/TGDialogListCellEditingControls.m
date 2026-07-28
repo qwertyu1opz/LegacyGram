@@ -37,9 +37,9 @@ static NSString *buttonTitleForType(TGDialogListCellEditingControlButton button)
         case TGDialogListCellEditingControlsUnread:
             return TGLocalized(@"DialogList.Unread");
         case TGDialogListCellEditingControlsArchive:
-            return @"Archive";
+            return TGLocalized(@"Legacy.ArchiveButton");
         case TGDialogListCellEditingControlsUnarchive:
-            return @"Chats";
+            return TGLocalized(@"Legacy.ChatsButton");
     }
 }
 
@@ -222,8 +222,8 @@ static CGRect validatedRect(CGRect value) {
                 TGLocalized(@"DialogList.Unpin"),
                 TGLocalized(@"Conversation.Mute"),
                 TGLocalized(@"Conversation.Unmute"),
-                @"Archive",
-                @"Chats",
+                TGLocalized(@"Legacy.ArchiveButton"),
+                TGLocalized(@"Legacy.ChatsButton"),
             ];
             buttonFont = TGSystemFontOfSize(14.0f);
             CGFloat buttonInset = 10.0f;

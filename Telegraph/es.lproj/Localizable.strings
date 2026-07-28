@@ -2511,4 +2511,9 @@
 "Settings.Donate" = "Donate";
 "Settings.DonateInfo" = "Support LegacyGram to help maintain and improve the app. Choose any amount on the donation page; every contribution is optional and appreciated.";
 "Settings.DonateButton" = "Open donation page";
+"Legacy.ArchiveButton" = "Archive";
+"Legacy.ChatsButton" = "Chats";
+"Legacy.ReactionButton" = "Reaction";
+"Legacy.RemoveReactionButton" = "Remove reaction";
+"Legacy.ClearChatCache" = "Clear chat cache";
 

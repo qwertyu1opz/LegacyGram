@@ -9,7 +9,7 @@
 #define IOS6_NOOP_LOG(...) do { } while (0)
 #endif
 
-#import "../config.h"
+#import "../../config.h"
 #import "../submodules/LegacyComponents/LegacyComponents/LegacyComponents.h"
 
 #import "TGLegacyComponentsGlobalsProvider.h"

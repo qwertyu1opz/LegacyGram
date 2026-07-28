@@ -195,7 +195,7 @@
 
 #import "TLRPCmessages_search.h"
 
-#import "../config.h"
+#import "../../config.h"
 
 #import "TLRPCmessages_sendMultiMedia.h"
 #import "TLRPCmessages_forwardMessages.h"

@@ -2870,4 +2870,8 @@ Unused sets are archived when you add more.";
 "Settings.Donate" = "Донат";
 "Settings.DonateInfo" = "Поддержите LegacyGram, чтобы помогать развивать и поддерживать приложение. На странице доната можно выбрать любую сумму — поддержка полностью добровольная.";
 "Settings.DonateButton" = "Открыть страницу доната";
-
+"Legacy.ArchiveButton" = "Архив";
+"Legacy.ChatsButton" = "Чаты";
+"Legacy.ReactionButton" = "Реакции";
+"Legacy.RemoveReactionButton" = "Удалить реакцию";
+"Legacy.ClearChatCache" = "Очистить кэш чатов";

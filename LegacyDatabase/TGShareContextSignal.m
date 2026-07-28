@@ -20,7 +20,7 @@
 
 #import <CommonCrypto/CommonKeyDerivation.h>
 
-#import "../config.h"
+#import "../../config.h"
 
 #import "TGLocalization.h"
 #import "TGNetworkSettings.h"

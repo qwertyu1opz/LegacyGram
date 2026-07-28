@@ -181,7 +181,7 @@
         NSMutableArray *shortcutItems = [[NSMutableArray alloc] init];
         [shortcutItems addObject:(_savedMessagesItem = [[TGDisclosureActionCollectionItem alloc] initWithTitle:TGLocalized(@"Settings.SavedMessages") action:@selector(savedMessagesPressed)])];
         [shortcutItems addObject:(_stickerSettingsItem = [[TGDisclosureActionCollectionItem alloc] initWithTitle:TGLocalized(@"ChatSettings.Stickers") action:@selector(stickerSettingsPressed)])];
-        [shortcutItems addObject:(_clearChatListCacheItem = [[TGDisclosureActionCollectionItem alloc] initWithTitle:@"Clear Chat Cache" action:@selector(clearChatListCachePressed)])];
+        [shortcutItems addObject:(_clearChatListCacheItem = [[TGDisclosureActionCollectionItem alloc] initWithTitle:TGLocalized(@"Legacy.ClearChatCache") action:@selector(clearChatListCachePressed)])];
         
         _shortcutSection = [[TGCollectionMenuSection alloc] initWithItems:shortcutItems];
         [self.menuSections addSection:_shortcutSection];
@@ -1080,7 +1080,7 @@
     [self setRightBarButtonItem:[[UIBarButtonItem alloc] initWithTitle:TGLocalized(@"Common.Edit") style:UIBarButtonItemStylePlain target:self action:@selector(editButtonPressed)] animated:false];
     
     _savedMessagesItem.title = TGLocalized(@"Settings.SavedMessages");
-    _clearChatListCacheItem.title = @"Clear Chat Cache";
+    _clearChatListCacheItem.title = TGLocalized(@"Legacy.ClearChatCache");
     _notificationsItem.title = TGLocalized(@"Settings.NotificationsAndSounds");
     _privacySettingsItem.title = TGLocalized(@"Settings.PrivacySettings");
     _chatSettingsItem.title = TGLocalized(@"Settings.ChatSettings");

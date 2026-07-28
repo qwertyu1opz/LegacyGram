@@ -73,7 +73,7 @@ static bool TGIos6IsHexString(NSString *string)
 #import "TLRPCmessages_getHistory.h"
 #import "TLRPCupdates_getChannelDifference.h"
 
-#import "../config.h"
+#import "../../config.h"
 
 #import "TGAccountSignals.h"
 

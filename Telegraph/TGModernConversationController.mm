@@ -6105,7 +6105,7 @@ typedef enum {
                         }
                     }
                 }
-                reactionAction = @{ @"title": hasReaction ? @"Remove Reaction" : @"Reaction", @"action": hasReaction ? @"removeReaction" : @"reaction" };
+                reactionAction = @{ @"title": hasReaction ? TGLocalized(@"Legacy.RemoveReactionButton") : TGLocalized(@"Legacy.ReactionButton"), @"action": hasReaction ? @"removeReaction" : @"reaction" };
             }
             
             if (messageItem->_message.actionInfo == nil && canPin) {
